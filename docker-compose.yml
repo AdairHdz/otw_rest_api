@@ -8,6 +8,14 @@ services:
       - database
     volumes:
       - images:/app/images
+  auth-server:
+    image: "adairhz/auth-server"
+    ports:
+      - "50000:50000"
+    depends_on:
+      - database
+    volumes:
+      - ./keys:/app/keys
   database:
     image: "mysql:8.0.26"
     container_name: ${DB_CONTAINER_NAME}
