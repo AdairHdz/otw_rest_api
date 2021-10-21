@@ -33,7 +33,7 @@ func (StateController) Index() gin.HandlerFunc {
 			response = append(response, struct{ID string "json:\"id\""; Name string "json:\"name\""}{ID: state.ID,Name: state.Name,},
 			)
 		}
-
+		
 		c.JSON(http.StatusOK, response)
 	}
 

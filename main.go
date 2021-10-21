@@ -18,8 +18,7 @@ func main() {
 		_, err := database.New()
 
 		if err != nil {
-			log.Fatal("Noo000oooOOOOOooo0o :(")
-			log.Fatal(err, "Noo000oooOOOOOooo0o :(")
+			log.Fatal(err)
 		}
     }()
 	

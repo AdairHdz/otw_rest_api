@@ -13,7 +13,7 @@ type User struct {
 	Password     string `validate:"required,min=8,securepass,max=150"`
 	UserType     int    `validate:"oneof=0 1"`
 	StateID      string `validate:"required,uuid4"`
-	BusinessName string `validate:"required_if=UserType 0,alpha"`
+	BusinessName string `validate:"required_if=UserType 0"`
 }
 
 func (u *User) ToEntity() (sr *entity.ServiceRequester, sp *entity.ServiceProvider, err error) {
