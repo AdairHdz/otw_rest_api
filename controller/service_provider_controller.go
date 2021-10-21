@@ -17,8 +17,7 @@ type ServiceProviderController struct{}
 func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		providerID := context.Param("providerID")
-		_, err := uuid.FromString(providerID)
-
+		_, err := uuid.FromString(providerID)		
 		if err != nil {
 			context.AbortWithStatusJSON(http.StatusConflict, "Invalid UUID")
 			return

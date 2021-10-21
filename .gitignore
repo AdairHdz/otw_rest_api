@@ -1,3 +1,4 @@
 images/*
 sql_data/*
 .env
+keys/*
