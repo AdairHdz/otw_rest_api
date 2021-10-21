@@ -41,6 +41,8 @@ func New() (*gorm.DB, error) {
 			db.AutoMigrate(&entity.Review{})
 			db.AutoMigrate(&entity.Score{})
 			db.AutoMigrate(&entity.ServiceRequest{})
+			db.AutoMigrate(&entity.Evidence{})
+			db.AutoMigrate(&entity.WorkingDay{})
 		}		
 	}
 
