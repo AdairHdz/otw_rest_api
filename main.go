@@ -28,6 +28,8 @@ func main() {
 	route.AppendUserRoutes(r)
 	route.AppendStateRoutes(r)
 	route.AppendToServiceProviderRoutes(r)
+	route.AppendToReviewRoutes(r)
+	route.AppendToPriceRateRoutes(r)
 	r.StaticFS("/images", http.Dir("./images"))
 	r.Run("0.0.0.0:8000")
 }

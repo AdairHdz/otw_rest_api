@@ -14,4 +14,5 @@ func init() {
 func AppendToServiceProviderRoutes(r *gin.Engine) {
 	sp := r.Group("/service-providers")
 	sp.PUT("/:providerID/image", serviceProviderController.StoreImage())
+	sp.GET("/:providerID", serviceProviderController.GetWithId())
 }

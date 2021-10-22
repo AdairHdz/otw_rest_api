@@ -3,7 +3,8 @@ package controller
 import (
 	"net/http"
 	"os"
-	"path/filepath"	
+	"path/filepath"
+	"github.com/AdairHdz/OTW-Rest-API/response"
 	"github.com/AdairHdz/OTW-Rest-API/database"
 	"github.com/AdairHdz/OTW-Rest-API/entity"
 	"github.com/AdairHdz/OTW-Rest-API/utility"
@@ -86,4 +87,64 @@ func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 
 		context.Status(http.StatusOK)
 	}
+}
+
+func (ServiceProviderController) GetWithId() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		providerID := context.Param("providerID")
+		_, err := uuid.FromString(providerID)
+
+		if err != nil {
+			context.AbortWithStatusJSON(http.StatusConflict, "Invalid UUID")
+			return
+		}
+
+		serviceProvider := entity.ServiceProvider{}
+
+		db, err := database.New()
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		r := db.Preload("User").Where("id = ?", providerID).Find(&serviceProvider)
+		if r.RowsAffected == 0 {
+			context.AbortWithStatusJSON(http.StatusNotFound, "There is not a service provider with the ID you provided.")
+			return
+		}		
+
+		score := entity.Score{}
+		averageScore := 0.00
+		s := db.Where("id = ?", serviceProvider.User.ID).Find(&score)
+		if s.RowsAffected != 0 {
+			averageScore = score.AverageScore
+		}
+
+		var response struct{
+			ID string `json:"id"`
+			Names string `json:"names"`
+			Lastname string `json:"lastname"`
+			BusinessPicture string `json:"businessPicture"`
+			BusinessName string `json:"businessName"`
+			AverageScore float64 `json:"averageScore"`
+		}
+
+		pathPicture := serviceProvider.ID + "/" + serviceProvider.BusinessPicture
+
+		response = struct{ID string "json:\"id\""; Names string "json:\"names\""; Lastname string "json:\"lastname\""; BusinessPicture string "json:\"businessPicture\""; BusinessName string "json:\"businessName\""; AverageScore float64 "json:\"averageScore\""}{			
+			ID: serviceProvider.ID,
+			Names: serviceProvider.User.Names,
+			Lastname: serviceProvider.User.Lastname,
+			BusinessPicture: pathPicture,
+			BusinessName: serviceProvider.BusinessName,
+			AverageScore: averageScore,			
+		}
+		
+
+		context.JSON(http.StatusOK, response)
+	}
+
 }

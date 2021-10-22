@@ -5,8 +5,9 @@ type Review struct {
 	Title string
 	DateOfReview string
 	Details string
-	//Evidence
+	Evidences []Evidence
 	Score int
 	ServiceProviderID string
 	ServiceRequesterID string
+	ServiceRequester ServiceRequester
 }
