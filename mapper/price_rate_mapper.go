@@ -11,12 +11,12 @@ type PriceRateWorkingDays struct{
 	Price        	float64			`json:"price"`
 	KindOfService 	int				`json:"kindOfService"`
 	City  			City			`json:"city"`
-	WorkingDays  	[]WorkingDay	`json:"workingDays"`
+	WorkingDays  	[]int	`json:"workingDays"`
 }
 
 func NewPriceRates() PriceRateWorkingDays{
 	return PriceRateWorkingDays{
-		WorkingDays: make([]WorkingDay, 0, 7),
+		WorkingDays: make([]int, 0, 7),
 	}
 }
 
@@ -42,7 +42,7 @@ func CreatePriceRateWorkingDaysAsResponse(priceRate entity.PriceRate) PriceRateW
 		workingDay := WorkingDay{
 			ID: WorkingDayItem.ID,
 		}
-		r.WorkingDays = append(r.WorkingDays, workingDay)
+		r.WorkingDays = append(r.WorkingDays, workingDay.ID)
 	}
 
 	city := City{

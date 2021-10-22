@@ -12,6 +12,7 @@ func init() {
 }
 
 func AppendToPriceRateRoutes(r *gin.Engine) {
-	sp := r.Group("/priceRates")
+	sp := r.Group("/price-rates")
 	sp.GET("/:providerID", priceRateController.FindAll())
+	sp.POST("/:providerID", priceRateController.Store())
 }

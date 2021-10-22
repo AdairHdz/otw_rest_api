@@ -123,7 +123,7 @@ func (ServiceProviderController) GetWithId() gin.HandlerFunc {
 			averageScore = score.AverageScore
 		}
 
-		var response []struct{
+		var response struct{
 			ID string `json:"id"`
 			Names string `json:"names"`
 			Lastname string `json:"lastname"`
@@ -134,8 +134,15 @@ func (ServiceProviderController) GetWithId() gin.HandlerFunc {
 
 		pathPicture := serviceProvider.ID + "/" + serviceProvider.BusinessPicture
 
-		response = append(response, struct{ID string "json:\"id\""; Names string "json:\"names\""; Lastname string "json:\"lastname\""; BusinessPicture string "json:\"businessPicture\""; BusinessName string "json:\"businessName\""; AverageScore float64 "json:\"averageScore\"" }{ID: serviceProvider.ID, Names: serviceProvider.User.Names, Lastname: serviceProvider.User.Lastname, BusinessPicture: pathPicture, BusinessName: serviceProvider.BusinessName, AverageScore: averageScore ,},
-		)
+		response = struct{ID string "json:\"id\""; Names string "json:\"names\""; Lastname string "json:\"lastname\""; BusinessPicture string "json:\"businessPicture\""; BusinessName string "json:\"businessName\""; AverageScore float64 "json:\"averageScore\""}{			
+			ID: serviceProvider.ID,
+			Names: serviceProvider.User.Names,
+			Lastname: serviceProvider.User.Lastname,
+			BusinessPicture: pathPicture,
+			BusinessName: serviceProvider.BusinessName,
+			AverageScore: averageScore,			
+		}
+		
 
 		context.JSON(http.StatusOK, response)
 	}
