@@ -10,6 +10,8 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
+	"github.com/AdairHdz/OTW-Rest-API/mapper"
+	"strconv"
 )
 
 type ServiceProviderController struct{}
@@ -147,4 +149,84 @@ func (ServiceProviderController) GetWithId() gin.HandlerFunc {
 		context.JSON(http.StatusOK, response)
 	}
 
+}
+
+func (ServiceProviderController) Index() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		page, err := strconv.Atoi(context.Query("page"))
+		if err != nil {
+			context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid page parameter")
+			return
+		}
+
+		pageElements, err := strconv.Atoi(context.Query("pageElements"))
+		if err != nil {
+			context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid page elements parameter")
+			return
+		}
+
+		kindOfService := 0
+		if context.Query("kindOfService") != "" {
+			kindOfService, err = strconv.Atoi(context.Query("kindOfService"))
+			if err != nil {
+				context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid kind of service parameter")
+				return
+			}
+		} 
+
+		price := 0.0000
+		if context.Query("maxPriceRate") != "" {
+			maxPriceRateValid, err := strconv.ParseFloat(context.Query("maxPriceRate"), 64)
+			if err != nil || maxPriceRateValid <= 0.0000 {
+				context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid price rate parameter")
+				return
+			}
+			price = maxPriceRateValid
+		} 
+
+		cityID := context.Query("cityID")
+
+		filters := &FiltersKindOfServiceAndCity{
+			KindOfService: kindOfService,
+			CityID: cityID,
+		}
+		
+
+		var price_rates []entity.PriceRate
+
+		db, err := database.New()
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		r := db
+		
+		if price > 0 {
+			r = db.Scopes(utility.Paginate(page, pageElements)).
+			Preload("ServiceProvider.User").Preload("ServiceProvider.User.Score").
+			Where("price_rates.price <= ?", price).
+			Where(filters).Find(&price_rates)
+	
+		} else {
+			r = db.Scopes(utility.Paginate(page, pageElements)).
+			Preload("ServiceProvider.User").Preload("ServiceProvider.User.Score").
+			Where(filters).Find(&price_rates)
+		}
+
+		if r.RowsAffected == 0 {
+			context.AbortWithStatusJSON(http.StatusNotFound, "There are no service providers that match the filters.")
+			return
+		}	
+		
+		result := []mapper.ServiceProvider{}
+		
+		for _, price_rate := range price_rates {
+			result = append(result, mapper.CreateServiceProvidersAsResponse(price_rate))
+		}
+		context.JSON(http.StatusOK, result)
+	}
 }
