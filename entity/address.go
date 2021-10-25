@@ -8,4 +8,5 @@ type Address struct {
 	OutdoorNumber string
 	Street string
 	Suburb string
+	ServiceRequesterID string
 }
