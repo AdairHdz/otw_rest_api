@@ -7,5 +7,5 @@ type User struct {
 	Account Account
 	Names string
 	Lastname string
-	Scores []Score
+	Score Score
 }
