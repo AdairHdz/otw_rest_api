@@ -21,7 +21,10 @@ func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 		providerID := context.Param("providerID")
 		_, err := uuid.FromString(providerID)		
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusConflict, "Invalid UUID")
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
 			return
 		}
 		
@@ -29,7 +32,10 @@ func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 		err = utility.CreateDirectory(path)
 
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusConflict, "There was an error while trying to save your image.")
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an error while trying to save your image.",
+			})
 			return
 		}
 
@@ -37,33 +43,48 @@ func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 		
 		db, err := database.New()
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusConflict, "There was an error while trying to save your image.")
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an error while trying to save your image.",
+			})
 			return
 		}
 
 		r := db.Where("id = ?", providerID).Find(&serviceProvider)
 		if r.RowsAffected == 0 {
-				context.AbortWithStatusJSON(http.StatusNotFound, "There is not a service provider with the ID you provided.")
-				return
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not Found",
+				Message: "There is not a service provider with the ID you provided.",
+			})
+			return
 		}		
 
 		dirIsEmpty, err := utility.DirIsEmpty(path)
 
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusConflict, "There was an error while trying to save your image.")
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an error while trying to save your image.",
+			})
 			return
 		}
 
 		file, noFileSentError := context.FormFile("image")
 		if noFileSentError != nil {
-			context.AbortWithStatusJSON(http.StatusBadRequest, "You didn't provide any file.")
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Request",
+				Message: "You didn't provide any file.",
+			})
 			return
 		}
 
 		fileExtension := filepath.Ext(file.Filename)
 
 		if !utility.IsImage(fileExtension) {
-			context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid image format. Please make sure your file has jpg, jpeg, or png extension")
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Request",
+				Message: "Invalid image format. Please make sure your file has jpg, jpeg, or png extension",
+			})
 			return
 		}
 
@@ -75,7 +96,10 @@ func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 		err = context.SaveUploadedFile(file, path+"/"+file.Filename)
 
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusConflict, "There was an error while trying to save your image.")
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an error while trying to save your image.",
+			})
 			return
 		}
 
@@ -83,7 +107,10 @@ func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 		r = db.Model(&entity.ServiceProvider{}).Where("id = ?", serviceProvider.ID).Update("business_picture", serviceProvider.BusinessPicture)
 		
 		if r.Error != nil {
-			context.AbortWithStatusJSON(http.StatusConflict, "There was an error while trying to save your image.")
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an error while trying to save your image.",
+			})
 			return
 		}		
 
@@ -97,7 +124,10 @@ func (ServiceProviderController) GetWithId() gin.HandlerFunc {
 		_, err := uuid.FromString(providerID)
 
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusConflict, "Invalid UUID")
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
 			return
 		}
 
@@ -114,7 +144,10 @@ func (ServiceProviderController) GetWithId() gin.HandlerFunc {
 
 		r := db.Preload("User").Where("id = ?", providerID).Find(&serviceProvider)
 		if r.RowsAffected == 0 {
-			context.AbortWithStatusJSON(http.StatusNotFound, "There is not a service provider with the ID you provided.")
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not Found",
+				Message: "There is not a service provider with the ID you provided.",
+			})
 			return
 		}		
 
@@ -155,13 +188,19 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		page, err := strconv.Atoi(context.Query("page"))
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid page parameter")
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Request",
+				Message: "Invalid page parameter.",
+			})
 			return
 		}
 
 		pageElements, err := strconv.Atoi(context.Query("pageElements"))
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid page elements parameter")
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Request",
+				Message: "Invalid page elements parameter.",
+			})
 			return
 		}
 
@@ -169,7 +208,10 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 		if context.Query("kindOfService") != "" {
 			kindOfService, err = strconv.Atoi(context.Query("kindOfService"))
 			if err != nil {
-				context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid kind of service parameter")
+				context.JSON(http.StatusBadRequest, response.ErrorResponse {
+					Error: "Bad Request",
+					Message: "Invalid kind of service parameter.",
+				})
 				return
 			}
 		} 
@@ -178,7 +220,10 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 		if context.Query("maxPriceRate") != "" {
 			maxPriceRateValid, err := strconv.ParseFloat(context.Query("maxPriceRate"), 64)
 			if err != nil || maxPriceRateValid <= 0.0000 {
-				context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid price rate parameter")
+				context.JSON(http.StatusBadRequest, response.ErrorResponse {
+					Error: "Bad Request",
+					Message: "Invalid price rate parameter.",
+				})
 				return
 			}
 			price = maxPriceRateValid
@@ -218,7 +263,10 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 		}
 
 		if r.RowsAffected == 0 {
-			context.AbortWithStatusJSON(http.StatusNotFound, "There are no service providers that match the filters.")
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not found",
+				Message: "There are no service providers that match the filters.",
+			})
 			return
 		}	
 		

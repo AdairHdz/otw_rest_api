@@ -20,19 +20,28 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 		_, err := uuid.FromString(providerID)
 
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusConflict, "Invalid UUID")
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
 			return
 		}
 
 		page, err := strconv.Atoi(context.Query("page"))
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid page parameter")
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Request",
+				Message: "Invalid page parameter.",
+			})
 			return
 		}
 
 		pageElements, err := strconv.Atoi(context.Query("pageElements"))
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid page elements parameter")
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Request",
+				Message: "Invalid page elements parameter.",
+			})
 			return
 		}
 
@@ -49,8 +58,11 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 		
 		r := db.Scopes(utility.Paginate(page, pageElements)).Preload("ServiceRequester.User").Preload("Evidences").Where("service_provider_id = ?", providerID).Find(&reviews)
 		if r.RowsAffected == 0 {
-				context.AbortWithStatusJSON(http.StatusNotFound, "There is not a service provider with the ID you provided or he has no reviews.")
-				return
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not found",
+				Message: "There is not a service provider with the ID you provided or he has no reviews.",
+			})
+			return
 		}	
 
 		result := []mapper.ReviewWithEvidence{}
