@@ -26,7 +26,10 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 		providerID := context.Param("providerID")
 		_, err := uuid.FromString(providerID)
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusConflict, "Invalid UUID")
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
 			return
 		}
 
@@ -34,7 +37,10 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 		if context.Query("kindOfService") != "" {
 			kindOfService, err = strconv.Atoi(context.Query("kindOfService"))
 			if err != nil {
-				context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid kind of service parameter")
+				context.JSON(http.StatusBadRequest, response.ErrorResponse {
+					Error: "Bad Request",
+					Message: "Invalid kind of service parameter",
+				})
 				return
 			}
 		} 
@@ -60,7 +66,10 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 		
 		r := db.Preload("City").Preload("WorkingDays").Where(filters).Find(&priceRates)
 		if r.RowsAffected == 0 {
-			context.AbortWithStatusJSON(http.StatusNotFound, "There is not a service provider with the ID you provided or he does not have rates with the filters entered.")
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not Found",
+				Message: "There is not a service provider with the ID you provided or he does not have rates with the filters entered.",
+			})
 			return
 		}	
 
