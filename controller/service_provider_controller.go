@@ -177,7 +177,7 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 		price := 0.0000
 		if context.Query("maxPriceRate") != "" {
 			maxPriceRateValid, err := strconv.ParseFloat(context.Query("maxPriceRate"), 64)
-			if err != nil {
+			if err != nil || maxPriceRateValid <= 0.0000 {
 				context.AbortWithStatusJSON(http.StatusBadRequest, "Invalid price rate parameter")
 				return
 			}
