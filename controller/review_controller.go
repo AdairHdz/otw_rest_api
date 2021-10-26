@@ -65,7 +65,7 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 			return
 		}	
 
-		result := []mapper.ReviewWithEvidence{}
+		result := []response.ReviewWithEvidence{}
 		
 		for _, review := range reviews {
 			result = append(result, mapper.CreateReviewWithEvidenceAsResponse(review))
