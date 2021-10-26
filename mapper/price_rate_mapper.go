@@ -2,34 +2,16 @@ package mapper
 
 import (
 	"github.com/AdairHdz/OTW-Rest-API/entity"
+	"github.com/AdairHdz/OTW-Rest-API/response"
 )
 
-type PriceRateWorkingDays struct{
-	ID 				string			`json:"id"`
-	StartingHour 	string			`json:"startingHour"`
-	EndingHour 		string			`json:"endingHour"`
-	Price        	float64			`json:"price"`
-	KindOfService 	int				`json:"kindOfService"`
-	City  			City			`json:"city"`
-	WorkingDays  	[]int	`json:"workingDays"`
-}
-
-func NewPriceRates() PriceRateWorkingDays{
-	return PriceRateWorkingDays{
+func NewPriceRates() response.PriceRateWorkingDays{
+	return response.PriceRateWorkingDays{
 		WorkingDays: make([]int, 0, 7),
 	}
 }
 
-type WorkingDay struct{
-	ID 			int 		`json:"id"`
-}
-
-type City struct{
-	ID 			string		`json:"id"`
-	Name		string 		`json:"name"`
-}
-
-func CreatePriceRateWorkingDaysAsResponse(priceRate entity.PriceRate) PriceRateWorkingDays {
+func CreatePriceRateWorkingDaysAsResponse(priceRate entity.PriceRate) response.PriceRateWorkingDays {
 	r := NewPriceRates()
 
 	r.ID = priceRate.ID
@@ -39,13 +21,13 @@ func CreatePriceRateWorkingDaysAsResponse(priceRate entity.PriceRate) PriceRateW
 	r.KindOfService = priceRate.KindOfService 		
 	
 	for _, WorkingDayItem := range priceRate.WorkingDays {
-		workingDay := WorkingDay{
+		workingDay := response.WorkingDay{
 			ID: WorkingDayItem.ID,
 		}
 		r.WorkingDays = append(r.WorkingDays, workingDay.ID)
 	}
 
-	city := City{
+	city := response.City{
 		ID: priceRate.City.ID,
 		Name: priceRate.City.Name,
 	}  
