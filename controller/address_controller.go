@@ -72,7 +72,7 @@ func (AddressController) Store() gin.HandlerFunc {
 func (AddressController) Index() gin.HandlerFunc {
 	return func(context *gin.Context) {
 
-		requester_id := context.Param("requesterId")
+		requester_id := context.Param("serviceRequesterId")
 		_, err := uuid.FromString(requester_id)
 		if err != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {

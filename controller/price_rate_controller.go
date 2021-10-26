@@ -23,7 +23,7 @@ type PriceRateController struct{}
 
 func (PriceRateController) FindAll() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		providerID := context.Param("providerID")
+		providerID := context.Param("serviceProviderId")
 		_, err := uuid.FromString(providerID)
 		if err != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
@@ -45,7 +45,7 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 			}
 		} 
 
-		cityID := context.Query("cityID")
+		cityID := context.Query("cityId")
 
 		filters := &FiltersKindOfServiceAndCity{
 			KindOfService: kindOfService,
@@ -88,7 +88,7 @@ func (PriceRateController) Store() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		var priceRate request.PriceRate
 
-		providerID := context.Param("providerID")
+		providerID := context.Param("serviceProviderId")
 
 		_, err := uuid.FromString(providerID)
 		if err != nil {
