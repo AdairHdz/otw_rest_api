@@ -16,4 +16,5 @@ func init() {
 func AppendToServiceRequesterRoutes(r *gin.Engine) {
 	sp := r.Group("/requesters")
 	sp.POST("/:serviceRequesterId/addresses", addressController.Store())
+	sp.GET(":requesterId/addresses", addressController.Index())
 }

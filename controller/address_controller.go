@@ -5,6 +5,8 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/database"
 	"github.com/AdairHdz/OTW-Rest-API/request"
 	"github.com/AdairHdz/OTW-Rest-API/response"
+	"github.com/AdairHdz/OTW-Rest-API/entity"
+	"github.com/AdairHdz/OTW-Rest-API/mapper"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 )
@@ -64,5 +66,58 @@ func (AddressController) Store() gin.HandlerFunc {
 			return
 		}
 		context.Status(http.StatusOK)
+	}
+}
+
+func (AddressController) Index() gin.HandlerFunc {
+	return func(context *gin.Context) {
+
+		requester_id := context.Param("requesterId")
+		_, err := uuid.FromString(requester_id)
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The RequesterId you provided has an invalid format",
+			})
+			return
+		}
+
+		city_id := context.Query("cityId")
+		_, err = uuid.FromString(city_id)
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The CityId you provided has an invalid format",
+			})
+			return
+		}
+
+		var addresses []entity.Address
+
+		db, err := database.New()
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		r:= db.Where("city_id=? AND service_requester_id=?", city_id, requester_id).Find(&addresses)
+
+		if r.RowsAffected == 0 {
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not found",
+				Message: "There are no addresses in that city that belong to that service requester.",
+			})
+			return
+		}	
+		
+		result := []response.Address{}
+		
+		for _, address := range addresses {
+			result = append(result, mapper.CreateAddressesAsResponse(address))
+		}
+		context.JSON(http.StatusOK, result)
 	}
 }
