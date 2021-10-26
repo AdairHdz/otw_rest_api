@@ -14,4 +14,5 @@ func init() {
 func AppendStateRoutes(r *gin.Engine) {	
 	u := r.Group("/states")
 	u.GET("", stateController.Index())
+	u.GET("/:stateId/cities", stateController.IndexCities())
 }
