@@ -18,7 +18,7 @@ type ServiceProviderController struct{}
 
 func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		providerID := context.Param("providerID")
+		providerID := context.Param("serviceProviderId")
 		_, err := uuid.FromString(providerID)		
 		if err != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
@@ -120,7 +120,7 @@ func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 
 func (ServiceProviderController) GetWithId() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		providerID := context.Param("providerID")
+		providerID := context.Param("serviceProviderId")
 		_, err := uuid.FromString(providerID)
 
 		if err != nil {
@@ -195,11 +195,11 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 			return
 		}
 
-		pageElements, err := strconv.Atoi(context.Query("pageElements"))
+		pageElements, err := strconv.Atoi(context.Query("pageSize"))
 		if err != nil {
 			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Request",
-				Message: "Invalid page elements parameter.",
+				Message: "Invalid page size parameter.",
 			})
 			return
 		}
@@ -229,7 +229,7 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 			price = maxPriceRateValid
 		} 
 
-		cityID := context.Query("cityID")
+		cityID := context.Query("cityId")
 
 		filters := &FiltersKindOfServiceAndCity{
 			KindOfService: kindOfService,

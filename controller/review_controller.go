@@ -16,7 +16,7 @@ type ReviewController struct{}
 
 func (ReviewController) GetWithId() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		providerID := context.Param("providerID")
+		providerID := context.Param("serviceProviderId")
 		_, err := uuid.FromString(providerID)
 
 		if err != nil {
@@ -36,7 +36,7 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 			return
 		}
 
-		pageElements, err := strconv.Atoi(context.Query("pageElements"))
+		pageElements, err := strconv.Atoi(context.Query("pageSize"))
 		if err != nil {
 			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Request",
