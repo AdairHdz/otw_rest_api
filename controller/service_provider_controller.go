@@ -1,17 +1,19 @@
 package controller
 
-import (
+import (	
 	"net/http"
 	"os"
 	"path/filepath"
-	"github.com/AdairHdz/OTW-Rest-API/response"
+	"strconv"
+	"time"
+
 	"github.com/AdairHdz/OTW-Rest-API/database"
 	"github.com/AdairHdz/OTW-Rest-API/entity"
+	"github.com/AdairHdz/OTW-Rest-API/mapper"
+	"github.com/AdairHdz/OTW-Rest-API/response"
 	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
-	"github.com/AdairHdz/OTW-Rest-API/mapper"
-	"strconv"
 )
 
 type ServiceProviderController struct{}
@@ -250,17 +252,15 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 
 		r := db
 		
-		if price > 0 {
-			r = db.Scopes(utility.Paginate(page, pageElements)).
+		currentHour := time.Now()		
+		hour := currentHour.Format("15:04")
+		
+		r = db.Scopes(utility.Paginate(page, pageElements)).
 			Preload("ServiceProvider.User").Preload("ServiceProvider.User.Score").
 			Preload("ServiceProvider").Where("price_rates.price <= ?", price).
-			Where(filters).Find(&price_rates)
-	
-		} else {
-			r = db.Scopes(utility.Paginate(page, pageElements)).
-			Preload("ServiceProvider.User").Preload("ServiceProvider.User.Score").
-			Preload("ServiceProvider").Where(filters).Find(&price_rates)
-		}
+			Where(filters).Where("? >= price_rates.starting_hour AND ? < price_rates.ending_hour", hour, hour).
+			Where("price_rates.id IN (?)", db.Table("pricerate_workingdays").Select("price_rate_id").Where("pricerate_workingdays.price_rate_id = price_rates.id")).
+			Find(&price_rates)
 
 		if r.RowsAffected == 0 {
 			context.JSON(http.StatusNotFound, response.ErrorResponse {

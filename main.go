@@ -1,8 +1,9 @@
 package main
 
-import (
+import (	
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/AdairHdz/OTW-Rest-API/database"
@@ -22,6 +23,7 @@ func main() {
 		}
     }()
 	
+	os.Setenv("TZ", "America/Mexico_City")	
 	r := gin.Default()
 	r.MaxMultipartMemory = 8 << 20
 	r.Use(middleware.CORSMiddleware())

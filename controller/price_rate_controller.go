@@ -84,6 +84,89 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 	}
 }
 
+func (PriceRateController) FindActivePriceRate() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		providerID := context.Param("serviceProviderId")
+
+		_, err := uuid.FromString(providerID)
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
+			return
+		}
+
+		cityID := context.Param("cityId")
+
+		_, err = uuid.FromString(cityID)
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
+			return
+		}
+		
+		kindOfService := context.Query("kindOfService")
+		db, err := database.New()
+		if err != nil {
+			context.AbortWithStatusJSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		filters := struct {
+			ServiceProviderID string
+			CityID string
+			KindOfService string
+		} {
+			ServiceProviderID: providerID,
+			CityID: cityID,
+			KindOfService: kindOfService,
+		}
+
+		type PriceResult struct {
+			Price float64
+		}
+
+		var priceRate PriceResult
+
+		currentHour := time.Now()		
+		hour := currentHour.Format("15:04")		
+		r := db.Model(&entity.PriceRate{}).Where(filters).
+		Where("? >= starting_hour AND ? < ending_hour", hour, hour).
+		Find(&priceRate)
+
+		if r.Error != nil {
+			context.AbortWithStatusJSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		if r.RowsAffected == 0 {
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not Found",
+				Message: "There is not an active price rate for the criteria you entered.",
+			})
+			return
+		}
+
+		response := struct {
+			Price float64 `json:"price"`
+		} {
+			Price: priceRate.Price,
+		}
+
+		context.JSON(http.StatusOK, response)
+
+	}
+}
+
 func (PriceRateController) Store() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		var priceRate request.PriceRate

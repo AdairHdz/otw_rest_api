@@ -28,4 +28,5 @@ func AppendToServiceProviderRoutes(r *gin.Engine) {
 
 	sp.GET("/:serviceProviderId/priceRates", priceRateController.FindAll())
 	sp.POST("/:serviceProviderId/priceRates", priceRateController.Store())
+	sp.GET("/:serviceProviderId/priceRates/:cityId", priceRateController.FindActivePriceRate())
 }
