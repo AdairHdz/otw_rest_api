@@ -20,7 +20,8 @@ type ServiceRequest struct {
 	EntityUUID
 	Cost float64
 	Date string
-	//DeliveryAddress Address
+	DeliveryAddress Address
+	DeliveryAddressID string
 	Description string
 	HasBeenReviewed bool
 	KindOfService int

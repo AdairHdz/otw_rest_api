@@ -31,6 +31,7 @@ func main() {
 	route.AppendToReviewRoutes(r)
 	route.AppendToPriceRateRoutes(r)
 	route.AppendToServiceRequesterRoutes(r)
+	route.AppendToRequestRoutes(r)
 	r.StaticFS("/images", http.Dir("./images"))
 	r.Run("0.0.0.0:8000")
 }
