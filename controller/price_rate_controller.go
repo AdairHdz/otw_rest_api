@@ -73,7 +73,7 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 			return
 		}	
 
-		result := []mapper.PriceRateWorkingDays{}
+		result := []response.PriceRateWorkingDays{}
 		
 		for _, priceRate := range priceRates {
 			result = append(result, mapper.CreatePriceRateWorkingDaysAsResponse(priceRate))

@@ -253,13 +253,13 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 		if price > 0 {
 			r = db.Scopes(utility.Paginate(page, pageElements)).
 			Preload("ServiceProvider.User").Preload("ServiceProvider.User.Score").
-			Where("price_rates.price <= ?", price).
+			Preload("ServiceProvider").Where("price_rates.price <= ?", price).
 			Where(filters).Find(&price_rates)
 	
 		} else {
 			r = db.Scopes(utility.Paginate(page, pageElements)).
 			Preload("ServiceProvider.User").Preload("ServiceProvider.User.Score").
-			Where(filters).Find(&price_rates)
+			Preload("ServiceProvider").Where(filters).Find(&price_rates)
 		}
 
 		if r.RowsAffected == 0 {
@@ -270,7 +270,7 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 			return
 		}	
 		
-		result := []mapper.ServiceProvider{}
+		result := []response.ServiceProvider{}
 		
 		for _, price_rate := range price_rates {
 			result = append(result, mapper.CreateServiceProvidersAsResponse(price_rate))
