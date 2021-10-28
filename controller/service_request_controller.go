@@ -216,3 +216,54 @@ func (RequestController) IndexProvider() gin.HandlerFunc {
 	}
 
 }
+
+
+func (RequestController) StoreStatus() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		requestId := context.Param("serviceRequestId")
+		_, err := uuid.FromString(requestId)
+
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
+			return
+		}
+
+		requestData := request.RequestStatus{}
+
+		err = context.BindJSON(&requestData)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Input",
+				Message: "Please make sure you have entered a correct service status. Correct values 0,1,2,3,4",
+			})
+			return
+		}
+
+		db, err := database.New()
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		request := entity.ServiceRequest{}
+
+		r := db.Model(&request).Where("id = ?", requestId).Update( "status" , requestData.ServiceStatus)
+
+		if r.RowsAffected == 0 {
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not Found",
+				Message: "There is not a request with the ID you provided.",
+			})
+			return
+		}		
+
+		context.Status(http.StatusOK)
+	}
+
+}
