@@ -15,6 +15,7 @@ func init() {
 	serviceProviderController = controller.ServiceProviderController{}
 	reviewController = controller.ReviewController{}
 	priceRateController = controller.PriceRateController{}
+	requestController = controller.RequestController{}
 }
 
 func AppendToServiceProviderRoutes(r *gin.Engine) {
@@ -29,4 +30,6 @@ func AppendToServiceProviderRoutes(r *gin.Engine) {
 	sp.GET("/:serviceProviderId/priceRates", priceRateController.FindAll())
 	sp.POST("/:serviceProviderId/priceRates", priceRateController.Store())
 	sp.GET("/:serviceProviderId/priceRates/:cityId", priceRateController.FindActivePriceRate())
+
+	sp.GET(":serviceProviderId/requests", requestController.IndexProvider())
 }

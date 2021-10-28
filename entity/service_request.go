@@ -27,5 +27,7 @@ type ServiceRequest struct {
 	KindOfService int
 	Status int
 	ServiceRequesterID string
+	ServiceRequester ServiceRequester
 	ServiceProviderID string
+	ServiceProvider ServiceProvider
 }
