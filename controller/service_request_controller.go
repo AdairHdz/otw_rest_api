@@ -17,9 +17,9 @@ type RequestController struct{}
 
 func (RequestController) Store() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		var service_request request.Request
+		var serviceRequest request.Request
 
-		err := context.BindJSON(&service_request)
+		err := context.BindJSON(&serviceRequest)
 		if err != nil {
 			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Input",
@@ -28,7 +28,7 @@ func (RequestController) Store() gin.HandlerFunc {
 			return
 		}		
 
-		request, err := service_request.ToEntity()
+		request, err := serviceRequest.ToEntity()
 		if err != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
 				Error: "Internal Error",
