@@ -8,3 +8,10 @@ type ServiceProvider struct{
 	PriceRate 		float64 	`json:"priceRate"`
 	BusinessName	string 		`json:"businessName"`
 }
+
+type ServiceProviderInRequest struct{
+	ID 				string		`json:"id"`
+	Names 			string 		`json:"names"`
+	Lastname 		string 		`json:"lastNames"`
+	BusinessName	string 		`json:"businessName"`
+}
