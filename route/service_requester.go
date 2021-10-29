@@ -22,4 +22,5 @@ func AppendToServiceRequesterRoutes(r *gin.Engine) {
 	sp.GET(":serviceRequesterId/addresses", addressController.Index())
 
 	sp.GET(":serviceRequesterId/requests", requestController.IndexRequester())
+	sp.GET(":serviceRequesterId/requestsDetails", requestController.IndexRequestRequester())
 }

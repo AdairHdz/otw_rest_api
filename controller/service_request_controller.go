@@ -267,3 +267,110 @@ func (RequestController) StoreStatus() gin.HandlerFunc {
 	}
 
 }
+
+
+func (RequestController) IndexRequestProvider() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		providerId := context.Param("serviceProviderId")
+		_, err := uuid.FromString(providerId)
+
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
+			return
+		}
+
+		date := context.Query("date")
+		_, err = time.Parse("2006-01-02", date)
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid date",
+				Message: "The date format you provided is not valid.",
+			})
+			return
+		}
+
+		request := []entity.ServiceRequest{}
+
+		db, err := database.New()
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		r := db.Where("service_provider_id = ?", providerId).Where("date = ?", date).Find(&request)
+
+		if r.RowsAffected == 0 {
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not Found",
+				Message: "There is not a request with the serviceProviderId or date you provided.",
+			})
+			return
+		}		
+		result := []response.ServiceRequestDetails{}
+
+		for _, request := range request {
+			result = append(result, mapper.CreateRequestsDetailsAsResponse(request))
+		}
+		context.JSON(http.StatusOK, result)
+	}
+
+}
+
+func (RequestController) IndexRequestRequester() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		requesterId := context.Param("serviceRequesterId")
+		_, err := uuid.FromString(requesterId)
+
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
+			return
+		}
+
+		date := context.Query("date")
+		_, err = time.Parse("2006-01-02", date)
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid date",
+				Message: "The date format you provided is not valid.",
+			})
+			return
+		}
+
+		request := []entity.ServiceRequest{}
+
+		db, err := database.New()
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		r := db.Where("service_requester_id = ?", requesterId).Where("date = ?", date).Find(&request)
+
+		if r.RowsAffected == 0 {
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not Found",
+				Message: "There is not a request with the serviceRequesterId or date you provided.",
+			})
+			return
+		}		
+		result := []response.ServiceRequestDetails{}
+
+		for _, request := range request {
+			result = append(result, mapper.CreateRequestsDetailsAsResponse(request))
+		}
+		context.JSON(http.StatusOK, result)
+	}
+
+}
