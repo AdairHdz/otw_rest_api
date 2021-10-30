@@ -36,6 +36,7 @@ func (p *PriceRate) ToEntity(serviceProviderID string) (pr entity.PriceRate, err
 		StartingHour: p.StartingHour,
 		ServiceProviderID: serviceProviderID,
 		WorkingDays: []entity.WorkingDay{},
+		KindOfService: p.KindOfService,
 	}
 
 	for _, w := range p.WorkingDays {
