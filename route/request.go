@@ -15,5 +15,5 @@ func AppendToRequestRoutes(r *gin.Engine) {
 	sp := r.Group("/requests")
 	sp.POST("", requestController.Store())
 
-	sp.PATCH(":serviceRequestId", requestController.StoreStatus())
+	sp.PATCH("/:serviceRequestId", requestController.StoreStatus())
 }
