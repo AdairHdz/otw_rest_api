@@ -84,3 +84,14 @@ func CreateRequestsAsResponse(request entity.ServiceRequest) response.ServiceReq
 
 	return r
 }
+
+func CreateRequestsDetailsAsResponse(request entity.ServiceRequest) response.ServiceRequestDetails {
+	r := response.ServiceRequestDetails {
+		ID: request.ID,
+		Date: request.Date,
+		KindOfService: request.KindOfService,
+		Status: request.Status,
+	}
+
+	return r
+}

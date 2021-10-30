@@ -32,4 +32,5 @@ func AppendToServiceProviderRoutes(r *gin.Engine) {
 	sp.GET("/:serviceProviderId/priceRates/:cityId", priceRateController.FindActivePriceRate())
 
 	sp.GET(":serviceProviderId/requests", requestController.IndexProvider())
+	sp.GET(":serviceProviderId/requestsDetails", requestController.IndexRequestProvider())
 }

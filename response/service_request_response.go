@@ -25,3 +25,10 @@ type ServiceRequestWithCity struct{
 	ServiceProvider 	ServiceProviderInRequest		`json:"serviceProvider"`
 	DeliveryAddress		AddressWithCity					`json:"deliveryAddress"`
 }
+
+type ServiceRequestDetails struct{
+	ID 					string							`json:"id"`
+	Date 				string							`json:"date"`
+	KindOfService 		int								`json:"kindOfService"`
+	Status 				int								`json:"status"`
+}
