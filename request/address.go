@@ -6,11 +6,11 @@ import (
 )
 
 type Address struct {
-	CityID string `validate:"required,uuid4"`
-	IndoorNumber string `validate:"required,max=50,alphanum"`
-	OutdoorNumber string `validate:"required,max=50,alphanum"`
-	Street string `validate:"required,max=100,alphanum"`
-	Suburb string `validate:"required,max=100,alphanum"`
+	CityID string `validate:"required,uuid4" json:"cityId"`
+	IndoorNumber string `validate:"omitempty,max=50,alphanum" json:"indoorNumber"`
+	OutdoorNumber string `validate:"required,max=50,alphanum" json:"outdoorNumber"`
+	Street string `validate:"required,max=100,alphanum" json:"street"`
+	Suburb string `validate:"required,max=100,alphanum" json:"suburb"`
 }
 
 func (a *Address) ToEntity(serviceRequesterID string) (ad *entity.Address, err error) {

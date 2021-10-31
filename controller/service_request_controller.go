@@ -7,6 +7,7 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/response"
 	"github.com/AdairHdz/OTW-Rest-API/entity"
 	"github.com/AdairHdz/OTW-Rest-API/mapper"
+	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/gin-gonic/gin"
 	"time"
 	"fmt"
@@ -27,6 +28,17 @@ func (RequestController) Store() gin.HandlerFunc {
 			})
 			return
 		}		
+
+		v := utility.NewValidator()				
+
+		err = v.Struct(serviceRequest)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Input",
+				Message: "Done Please make sure you've entered the required fields in the specified format. For more details, check the API documentation",
+			})
+			return
+		}
 
 		request, err := serviceRequest.ToEntity()
 		if err != nil {
@@ -61,7 +73,7 @@ func (RequestController) Store() gin.HandlerFunc {
 			})
 			return
 		}
-		context.Status(http.StatusNoContent)
+		context.Status(http.StatusOK)
 	}
 }
 
@@ -186,6 +198,18 @@ func (RequestController) StoreStatus() gin.HandlerFunc {
 		requestData := request.RequestStatus{}
 
 		err = context.BindJSON(&requestData)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Input",
+				Message: "Please make sure you have entered a correct service status. Correct values 0,1,2,3,4",
+			})
+			return
+		}
+
+		
+		v := utility.NewValidator()				
+
+		err = v.Struct(requestData)
 		if err != nil {
 			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Input",

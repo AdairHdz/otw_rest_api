@@ -6,6 +6,7 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/request"
 	"github.com/AdairHdz/OTW-Rest-API/response"
 	"github.com/AdairHdz/OTW-Rest-API/entity"
+	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/AdairHdz/OTW-Rest-API/mapper"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -34,7 +35,18 @@ func (AddressController) Store() gin.HandlerFunc {
 				Message: "Please make sure you've entered the required fields in the specified format. For more details, check the API documentation",
 			})
 			return
-		}			
+		}
+		
+		v := utility.NewValidator()				
+
+		err = v.Struct(address)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Input",
+				Message: "Please make sure you've entered the required fields in the specified format. For more details, check the API documentation",
+			})
+			return
+		}	
 
 		a, err := address.ToEntity(requesterID)
 

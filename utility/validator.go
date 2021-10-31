@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"unicode"
-
 	"github.com/go-playground/validator/v10"
 )
 
@@ -15,6 +14,7 @@ func NewValidator() *validator.Validate {
 		validate = validator.New()
 		validate.RegisterValidation("securepass", securePassword)
 		validate.RegisterValidation("alpha", alpha)
+		validate.RegisterValidation("alphanum", alphaNumericRegexString)
 	}
 	return validate
 }
@@ -53,6 +53,16 @@ func securePassword(fl validator.FieldLevel) bool {
 func alpha(fl validator.FieldLevel) bool {
 	fieldValue := fl.Field().String()	
 	matches, err := regexp.MatchString(`^[^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{1,}$`, fieldValue)
+	if err != nil {
+		return false
+	}
+	fmt.Println(fieldValue, matches)
+	return matches
+}
+
+func alphaNumericRegexString(fl validator.FieldLevel) bool {
+	fieldValue := fl.Field().String()	
+	matches, err := regexp.MatchString(`^\S[À-ÿA-Za-z0-9\s-.&#]+$`, fieldValue)
 	if err != nil {
 		return false
 	}
