@@ -35,7 +35,7 @@ func (RequestController) Store() gin.HandlerFunc {
 		if err != nil {
 			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Input",
-				Message: "Done Please make sure you've entered the required fields in the specified format. For more details, check the API documentation",
+				Message: "Please make sure you've entered the required fields in the specified format. For more details, check the API documentation",
 			})
 			return
 		}
