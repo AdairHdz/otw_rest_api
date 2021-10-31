@@ -65,10 +65,21 @@ func (RequestController) Store() gin.HandlerFunc {
 	}
 }
 
-func (RequestController) GetWithId() gin.HandlerFunc {
+func (RequestController) GetRequestRequester() gin.HandlerFunc {
 	return func(context *gin.Context) {
+		requesterId := context.Param("serviceRequesterId")
+		_, err := uuid.FromString(requesterId)
+
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
+			return
+		}
+
 		requestId := context.Param("serviceRequestId")
-		_, err := uuid.FromString(requestId)
+		_, err = uuid.FromString(requestId)
 
 		if err != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
@@ -89,80 +100,24 @@ func (RequestController) GetWithId() gin.HandlerFunc {
 			return
 		}
 
-		r := db.Preload("DeliveryAddress").Preload("ServiceProvider.User").
-		Preload("ServiceRequester.User").Where("id = ?", requestId).Find(&request)
-
-		if r.RowsAffected == 0 {
-			context.JSON(http.StatusNotFound, response.ErrorResponse {
-				Error: "Not Found",
-				Message: "There is not a request with the ID you provided.",
-			})
-			return
-		}		
-		result := response.ServiceRequest{}
-
-		result = mapper.CreateRequestAsResponse(request)
-		context.JSON(http.StatusOK, result)
-	}
-
-}
-
-func (RequestController) IndexRequester() gin.HandlerFunc {
-	return func(context *gin.Context) {
-		requesterId := context.Param("serviceRequesterId")
-		_, err := uuid.FromString(requesterId)
-
-		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Invalid ID",
-				Message: "The ID you provided has an invalid format",
-			})
-			return
-		}
-
-		date := context.Query("date")
-		_, err = time.Parse("2006-01-02", date)
-		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Invalid date",
-				Message: "The date format you provided is not valid.",
-			})
-			return
-		}
-
-		request := []entity.ServiceRequest{}
-
-		db, err := database.New()
-		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
-				Message: "There was an unexpected error while processing your data. Please try again later",
-			})
-			return
-		}
-
 		r := db.Preload("DeliveryAddress.City").Preload("ServiceProvider.User").
 		Preload("ServiceRequester.User").Where("service_requester_id = ?", requesterId).
-		Where("date = ?", date).Find(&request)
+		Where("id = ?", requestId).Find(&request)
 
 		if r.RowsAffected == 0 {
 			context.JSON(http.StatusNotFound, response.ErrorResponse {
 				Error: "Not Found",
-				Message: "There is not a request with the serviceRequesterId or date you provided.",
+				Message: "There is not a request with the serviceRequesterId and serviceRequestId you provided.",
 			})
 			return
 		}		
-		result := []response.ServiceRequestWithCity{}
-
-		for _, request := range request {
-			result = append(result, mapper.CreateRequestsAsResponse(request))
-		}
+		result := mapper.CreateRequestsAsResponse(request)
 		context.JSON(http.StatusOK, result)
 	}
 
 }
 
-func (RequestController) IndexProvider() gin.HandlerFunc {
+func (RequestController) GetRequestProvider() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		providerId := context.Param("serviceProviderId")
 		_, err := uuid.FromString(providerId)
@@ -175,17 +130,18 @@ func (RequestController) IndexProvider() gin.HandlerFunc {
 			return
 		}
 
-		date := context.Query("date")
-		_, err = time.Parse("2006-01-02", date)
+		requestId := context.Param("serviceRequestId")
+		_, err = uuid.FromString(requestId)
+
 		if err != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Invalid date",
-				Message: "The date format you provided is not valid.",
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
 			})
 			return
 		}
 
-		request := []entity.ServiceRequest{}
+		request := entity.ServiceRequest{}
 
 		db, err := database.New()
 		if err != nil {
@@ -198,20 +154,16 @@ func (RequestController) IndexProvider() gin.HandlerFunc {
 
 		r := db.Preload("DeliveryAddress.City").Preload("ServiceProvider.User").
 		Preload("ServiceRequester.User").Where("service_provider_id = ?", providerId).
-		Where("date = ?", date).Find(&request)
+		Where("id = ?", requestId).Find(&request)
 
 		if r.RowsAffected == 0 {
 			context.JSON(http.StatusNotFound, response.ErrorResponse {
 				Error: "Not Found",
-				Message: "There is not a request with the serviceProviderId or date you provided.",
+				Message: "There is not a request with the serviceProviderId and serviceRequestId you provided.",
 			})
 			return
 		}		
-		result := []response.ServiceRequestWithCity{}
-
-		for _, request := range request {
-			result = append(result, mapper.CreateRequestsAsResponse(request))
-		}
+		result := mapper.CreateRequestsAsResponse(request)
 		context.JSON(http.StatusOK, result)
 	}
 
