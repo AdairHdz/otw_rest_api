@@ -7,6 +7,7 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/request"
 	"github.com/AdairHdz/OTW-Rest-API/response"
 	"github.com/AdairHdz/OTW-Rest-API/utility"
+	"github.com/AdairHdz/OTW-Rest-API/mapper"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -82,6 +83,12 @@ func (UserController) Store() gin.HandlerFunc {
 			return
 		}
 
-		context.Status(http.StatusOK)
+		res := response.User{}
+		if serviceRequester != nil {
+			res = mapper.CreateRequesterAddAsResponse(serviceRequester)
+		} else if serviceProvider != nil {
+			res = mapper.CreateProviderAddAsResponse(serviceProvider)
+		}	
+		context.JSON(http.StatusOK, res)
 	}
 }

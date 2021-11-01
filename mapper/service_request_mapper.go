@@ -47,6 +47,20 @@ func CreateRequestsAsResponse(request entity.ServiceRequest) response.ServiceReq
 	return r
 }
 
+func CreateRequestAddAsResponse(request *entity.ServiceRequest) response.ServiceRequestAdd {
+	r := response.ServiceRequestAdd {
+		ID: request.ID,
+		Cost: request.Cost,
+		DeliveryAddressId: request.DeliveryAddressID,
+		Description: request.Description,
+		KindOfService: request.KindOfService,
+		ServiceProviderId: request.ServiceProviderID,
+		ServiceRequesterId: request.ServiceRequesterID,
+	}
+
+	return r
+}
+
 func CreateRequestsDetailsAsResponse(request entity.ServiceRequest) response.ServiceRequestDetails {
 	r := response.ServiceRequestDetails {
 		ID: request.ID,
