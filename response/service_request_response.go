@@ -13,6 +13,17 @@ type ServiceRequestWithCity struct{
 	DeliveryAddress		AddressWithCity					`json:"deliveryAddress"`
 }
 
+
+type ServiceRequestAdd struct{
+	ID 					string							`json:"id"`
+	Cost 				float64							`json:"cost"`
+	DeliveryAddressId	string 							`json:"deliveryAddressId"`
+	Description 		string							`json:"description"`
+	KindOfService 		int								`json:"kindOfService"`
+	ServiceProviderId 	string 							`json:"serviceProviderId"`
+	ServiceRequesterId 	string							`json:"serviceRequesterId"`
+}
+
 type ServiceRequestDetails struct{
 	ID 					string							`json:"id"`
 	Date 				string							`json:"date"`

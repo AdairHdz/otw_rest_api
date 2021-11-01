@@ -48,7 +48,7 @@ func (AddressController) Store() gin.HandlerFunc {
 			return
 		}	
 
-		a, err := address.ToEntity(requesterID)
+		addressEntity, err := address.ToEntity(requesterID)
 
 		if err != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
@@ -68,7 +68,7 @@ func (AddressController) Store() gin.HandlerFunc {
 			return
 		}
 
-		result := db.Create(&a)
+		result := db.Create(&addressEntity)
 
 		if result.Error != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
@@ -77,7 +77,9 @@ func (AddressController) Store() gin.HandlerFunc {
 			})
 			return
 		}
-		context.Status(http.StatusOK)
+
+		r := mapper.CreateAddressAsResponse(addressEntity)
+		context.JSON(http.StatusOK, r)
 	}
 }
 

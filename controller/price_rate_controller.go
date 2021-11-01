@@ -271,7 +271,9 @@ func (PriceRateController) Store() gin.HandlerFunc {
 			})
 			return
 		}
-		context.Status(http.StatusOK)
+
+		result := mapper.CreatePriceRateAddAsResponse(&e)
+		context.JSON(http.StatusOK, result)
 	}
 }
 
