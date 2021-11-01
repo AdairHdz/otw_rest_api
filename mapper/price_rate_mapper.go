@@ -11,6 +11,12 @@ func NewPriceRates() response.PriceRateWorkingDays{
 	}
 }
 
+func NewPriceRate() response.PriceRate{
+	return response.PriceRate{
+		WorkingDays: make([]int, 0, 7),
+	}
+}
+
 func CreatePriceRateWorkingDaysAsResponse(priceRate entity.PriceRate) response.PriceRateWorkingDays {
 	r := NewPriceRates()
 
@@ -36,8 +42,8 @@ func CreatePriceRateWorkingDaysAsResponse(priceRate entity.PriceRate) response.P
 	return r
 }
 
-func CreatePriceRateAddAsResponse(priceRate *entity.PriceRate) response.PriceRateWorkingDays {
-	r := NewPriceRates()
+func CreatePriceRateAddAsResponse(priceRate *entity.PriceRate) response.PriceRate {
+	r := NewPriceRate()
 	r.ID = priceRate.ID
 	r.StartingHour = priceRate.StartingHour
 	r.EndingHour = priceRate.EndingHour
