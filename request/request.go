@@ -6,10 +6,10 @@ import (
 )
 
 type Request struct {
-	Cost float64 `validate:"required" json:"cost"` 
+	Cost float64 `validate:"required,numeric" json:"cost"` 
 	DeliveryAddressID string `validate:"required,uuid4" json:"deliveryAddressId"`
-	Description string `validate:"required,max=50" json:"description"`
-	KindOfService int `validate:"required,numeric" json:"kindOfService"`
+	Description string `validate:"required,max=255,alphanum" json:"description"`
+	KindOfService int `validate:"oneof=0 1 2 3 4" json:"kindOfService"`
 	ServiceRequesterID string `validate:"required,uuid4" json:"serviceRequesterId" `
 	ServiceProviderID string  `validate:"required,uuid4" json:"serviceProviderId"`
 }
