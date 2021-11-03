@@ -2,14 +2,16 @@ package controller
 
 import (
 	"net/http"
-	"github.com/AdairHdz/OTW-Rest-API/response"
+	"strconv"
+
 	"github.com/AdairHdz/OTW-Rest-API/database"
 	"github.com/AdairHdz/OTW-Rest-API/entity"
-	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/AdairHdz/OTW-Rest-API/mapper"
+	"github.com/AdairHdz/OTW-Rest-API/request"
+	"github.com/AdairHdz/OTW-Rest-API/response"
+	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
-	"strconv"
 )
 
 type ReviewController struct{}
@@ -75,4 +77,64 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 
 	}
 
+}
+
+func (ReviewController) Store() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		providerID := context.Param("serviceProviderId")
+		_, err := uuid.FromString(providerID)
+
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
+			return
+		}
+
+		var reviewBody request.Review
+		err = context.BindJSON(&reviewBody)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Request",
+				Message: "Please make sure you have entered the required fields in a valid format",
+			})
+			return
+		}
+
+		validator := utility.NewValidator()
+		err = validator.Struct(reviewBody)
+		
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Request",
+				Message: "Please make sure you have entered the required fields ina valid format",
+			})
+			return
+		}
+
+		db, err := database.New()
+
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		reviewEntity := reviewBody.ToEntity(providerID)
+		r := db.Create(&reviewEntity)
+		if r.Error != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		response := mapper.CreateReviewWithRequesterIDAsResponse(reviewEntity)
+		context.JSON(http.StatusOK, response)
+
+	}
 }

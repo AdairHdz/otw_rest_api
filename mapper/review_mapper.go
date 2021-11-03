@@ -33,3 +33,27 @@ func CreateReviewWithEvidenceAsResponse(review entity.Review) response.ReviewWit
 	return r
 }
 
+func CreateReviewWithRequesterIDAsResponse(review entity.Review) (response.ReviewWithRequesterID) {
+	r := response.ReviewWithRequesterID{
+		ID: review.ID,
+		Title: review.Title,
+		DateOfReview: review.DateOfReview,
+		Details: review.Details,
+		Score: review.Score,
+		ServiceRequesterID: review.ServiceRequesterID,
+		Evidences: make([]response.Evidence, 0),
+	}
+
+	for _, evidenceItem := range review.Evidences {
+		evidence := response.Evidence{
+			ID: evidenceItem.ID,
+			FileName: evidenceItem.FileName,
+			FileExtension: evidenceItem.FileExtension,
+		}
+		r.Evidences = append(r.Evidences, evidence)
+	}
+
+	return r
+
+}
+
