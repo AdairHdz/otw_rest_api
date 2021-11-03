@@ -5,7 +5,7 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/controller"
 )
 
-var(
+var (
 	serviceProviderController controller.ServiceProviderController
 	reviewController controller.ReviewController
 	priceRateController controller.PriceRateController
@@ -29,6 +29,7 @@ func AppendToServiceProviderRoutes(r *gin.Engine) {
 
 	sp.GET("/:serviceProviderId/priceRates", priceRateController.FindAll())
 	sp.POST("/:serviceProviderId/priceRates", priceRateController.Store())
+	sp.POST("/:serviceProviderId/reviews", reviewController.Store())
 	sp.GET("/:serviceProviderId/priceRates/:cityId", priceRateController.FindActivePriceRate())
 
 	sp.GET("/:serviceProviderId/requests/:serviceRequestId", requestController.GetRequestProvider())
