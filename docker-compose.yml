@@ -8,6 +8,7 @@ services:
       - database
     volumes:
       - images:/app/images
+      - ./public/reviews:/app/public/reviews
   auth-server:
     image: "adairhz/auth-server"
     ports:
