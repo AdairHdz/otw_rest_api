@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
+	"path/filepath"
 	"strconv"
 
 	"github.com/AdairHdz/OTW-Rest-API/database"
@@ -136,5 +138,71 @@ func (ReviewController) Store() gin.HandlerFunc {
 		response := mapper.CreateReviewWithRequesterIDAsResponse(reviewEntity)
 		context.JSON(http.StatusOK, response)
 
+	}
+}
+
+func (ReviewController) UploadEvidence() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		var reviewId string = context.Param("reviewId")
+		const maxFileSize = 10855731
+		form, _ := context.MultipartForm()
+		files := form.File["evidence[]"]
+		path := fmt.Sprintf("./public/reviews/%s", reviewId)
+		directoryCreationError := utility.CreateDirectory(path)
+
+		if directoryCreationError != nil {
+			println(directoryCreationError.Error())
+			context.AbortWithStatusJSON(http.StatusConflict, "There was an error while trying to save the evidence")
+			return
+		}
+
+		dirIsEmpty, directoryEmptinessVerificationError := utility.DirIsEmpty(path)
+
+		if directoryEmptinessVerificationError != nil {
+			println(directoryEmptinessVerificationError.Error())
+			context.AbortWithStatusJSON(http.StatusConflict, "There was an error while trying to save the evidence")
+			return
+		}
+
+		if !dirIsEmpty {
+			println("Attempted to add files to a review that already has files registered")
+			context.AbortWithStatusJSON(http.StatusConflict, "Attempted to add files to a review that already has files registered")
+			return
+		}
+
+		if len(files) == 0 {
+			println("Request should contain at least one file")
+			context.AbortWithStatusJSON(http.StatusBadRequest, "Request should contain at least one file")
+			return
+		} else if len(files) > 3 {
+			println("Can't upload more than 3 files per request")
+			context.AbortWithStatusJSON(http.StatusBadRequest, "Can't upload more than 3 files per request")
+			return
+		}
+
+		for _, file := range files {
+			var fileSizeTotal int64 = file.Size
+			if fileSizeTotal > maxFileSize {
+				println("One or more files have a size greater than 10 MB")
+				context.AbortWithStatusJSON(http.StatusConflict, "One or more files have a size greater than 10 MB")
+				return
+			}
+			fileExtension := filepath.Ext(file.Filename)
+			if !utility.EvidenceHasValidFormat(fileExtension) {
+				println("One or more files have invalid format")
+				context.AbortWithStatusJSON(http.StatusBadRequest, "One or more files have invalid format")
+				return
+			}
+		}
+
+		for _, file := range files {
+			fileSavingError := context.SaveUploadedFile(file, path+"/"+file.Filename)
+			if fileSavingError != nil {
+				println("There was an error while trying to save the evidence", fileSavingError.Error())
+				context.AbortWithStatusJSON(http.StatusConflict, "There was an error while trying to save the evidence")
+			}
+		}
+
+		context.Status(http.StatusCreated)
 	}
 }
