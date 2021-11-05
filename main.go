@@ -33,5 +33,6 @@ func main() {
 	route.AppendToServiceRequesterRoutes(r)
 	route.AppendToRequestRoutes(r)
 	r.StaticFS("/images", http.Dir("./images"))
+	r.StaticFS("/reviews", http.Dir("./public/reviews"))
 	r.Run("0.0.0.0:8000")
 }

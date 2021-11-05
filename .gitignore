@@ -2,3 +2,4 @@ images/*
 sql_data/*
 .env
 keys/*
+public/reviews/*

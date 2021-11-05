@@ -241,7 +241,7 @@ func (RequestController) StoreStatus() gin.HandlerFunc {
 			return
 		}		
 
-		context.Status(http.StatusOK)
+		context.Status(http.StatusNoContent)
 	}
 
 }
