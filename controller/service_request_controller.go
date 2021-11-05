@@ -62,7 +62,7 @@ func (RequestController) Store() gin.HandlerFunc {
 		t := time.Now()
 		request.Date = fmt.Sprintf("%d-%02d-%02d", t.Year(), t.Month(), t.Day())
 		request.HasBeenReviewed = false
-		request.Status = 1
+		request.Status = entity.PENDING_OF_ACCEPTANCE
 
 		result := db.Create(&request)
 
