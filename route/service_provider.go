@@ -23,13 +23,13 @@ func AppendToServiceProviderRoutes(r *gin.Engine) {
 	sp.PUT("/:serviceProviderId/image", serviceProviderController.StoreImage())
 	
 	sp.GET("/:serviceProviderId", serviceProviderController.GetWithId())
-	sp.GET("", serviceProviderController.Index())
 
 	sp.GET("/:serviceProviderId/reviews", reviewController.GetWithId())
 
 	sp.GET("/:serviceProviderId/priceRates", priceRateController.FindAll())
 	sp.POST("/:serviceProviderId/priceRates", priceRateController.Store())
 	sp.GET("/:serviceProviderId/priceRates/:cityId", priceRateController.FindActivePriceRate())
+	sp.GET("", serviceProviderController.Index())
 
 	sp.GET("/:serviceProviderId/requests/:serviceRequestId", requestController.GetRequestProvider())
 	sp.GET("/:serviceProviderId/requests", requestController.IndexRequestProvider())

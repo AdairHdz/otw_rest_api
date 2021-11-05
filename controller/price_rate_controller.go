@@ -9,6 +9,7 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/mapper"
 	"github.com/AdairHdz/OTW-Rest-API/request"
 	"github.com/AdairHdz/OTW-Rest-API/response"
+	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 )
@@ -37,7 +38,7 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 		if context.Query("kindOfService") != "" {
 			kindOfService, err = strconv.Atoi(context.Query("kindOfService"))
 			if err != nil {
-				context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				context.JSON(http.StatusConflict, response.ErrorResponse {
 					Error: "Bad Request",
 					Message: "Invalid kind of service parameter",
 				})
@@ -46,6 +47,16 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 		} 
 
 		cityID := context.Query("cityId")
+		if cityID != "" {
+		_, err = uuid.FromString(cityID)
+			if err != nil {
+				context.JSON(http.StatusConflict, response.ErrorResponse {
+					Error: "Invalid ID",
+					Message: "The city ID you provided has an invalid format",
+				})
+				return
+			}
+		}
 
 		filters := &FiltersKindOfServiceAndCity{
 			KindOfService: kindOfService,
@@ -108,7 +119,18 @@ func (PriceRateController) FindActivePriceRate() gin.HandlerFunc {
 			return
 		}
 		
-		kindOfService := context.Query("kindOfService")
+		kindOfService := 0
+		if context.Query("kindOfService") != "" {
+			kindOfService, err = strconv.Atoi(context.Query("kindOfService"))
+			if err != nil {
+				context.JSON(http.StatusConflict, response.ErrorResponse {
+					Error: "Bad Request",
+					Message: "Invalid kind of service parameter",
+				})
+				return
+			}
+		} 
+
 		db, err := database.New()
 		if err != nil {
 			context.AbortWithStatusJSON(http.StatusConflict, response.ErrorResponse {
@@ -121,7 +143,7 @@ func (PriceRateController) FindActivePriceRate() gin.HandlerFunc {
 		filters := struct {
 			ServiceProviderID string
 			CityID string
-			KindOfService string
+			KindOfService int
 		} {
 			ServiceProviderID: providerID,
 			CityID: cityID,
@@ -190,6 +212,17 @@ func (PriceRateController) Store() gin.HandlerFunc {
 			})
 			return
 		}
+
+		v := utility.NewValidator()				
+
+		err = v.Struct(priceRate)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Input",
+				Message: "Please make sure you've entered the required fields in the specified format. For more details, check the API documentation",
+			})
+			return
+		}	
 
 		e, err := priceRate.ToEntity(providerID)
 		if err != nil {

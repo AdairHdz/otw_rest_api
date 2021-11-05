@@ -8,12 +8,12 @@ import (
 )
 
 type PriceRate struct {
-	StartingHour  string  `json:"startingHour"`
-	EndingHour    string  `json:"endingHour"`
-	Price         float64 `json:"price"`
-	KindOfService int     `json:"kindOfService"`
-	CityID        string  `json:"cityId"`
-	WorkingDays   []int   `json:"workingDays"`
+	StartingHour  string  `validate:"required" json:"startingHour"`
+	EndingHour    string  `validate:"required" json:"endingHour"`
+	Price         float64 `validate:"numeric" json:"price"`
+	KindOfService int     `validate:"oneof=0 1 2 3 4" json:"kindOfService"`
+	CityID        string  `validate:"required,uuid4" json:"cityId"`
+	WorkingDays   []int   `validate:"required"json:"workingDays"`
 }
 
 func (p *PriceRate) ToEntity(serviceProviderID string) (pr entity.PriceRate, err error) {
@@ -37,6 +37,7 @@ func (p *PriceRate) ToEntity(serviceProviderID string) (pr entity.PriceRate, err
 		ServiceProviderID: serviceProviderID,
 		WorkingDays: []entity.WorkingDay{},
 		KindOfService: p.KindOfService,
+		Price: p.Price,
 	}
 
 	for _, w := range p.WorkingDays {
