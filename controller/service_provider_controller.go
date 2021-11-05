@@ -232,6 +232,14 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 		} 
 
 		cityID := context.Query("cityId")
+		_, err = uuid.FromString(cityID)
+			if err != nil {
+				context.JSON(http.StatusBadRequest, response.ErrorResponse {
+					Error: "Invalid ID",
+					Message: "The city ID you provided has an invalid format",
+				})
+				return
+			}
 
 		filters := &FiltersKindOfServiceAndCity{
 			KindOfService: kindOfService,
