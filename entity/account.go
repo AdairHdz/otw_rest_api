@@ -1,7 +1,8 @@
 package entity
 
 const (
-	SERVICE_PROVIDER = iota
+	_ = iota
+	SERVICE_PROVIDER
 	SERVICE_REQUESTER
 )
 
