@@ -1,7 +1,8 @@
 package entity
 
 const (
-	SERVICE_PAYMENT = iota
+	_  = iota
+	SERVICE_PAYMENT
 	DRUG_PURCHASE
 	GROCERY_SHOPPING
 	DELIVERY
@@ -9,7 +10,8 @@ const (
 )
 
 const (
-	PENDING_OF_ACCEPTANCE = iota
+	_ = iota
+	PENDING_OF_ACCEPTANCE
 	ACTIVE
 	CONCLUDED
 	CANCELED		

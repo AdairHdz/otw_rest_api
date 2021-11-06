@@ -1,5 +1,5 @@
 package request
 
 type RequestStatus struct {
-	ServiceStatus int `validate:"oneof=0 1 2 3 4" json:"serviceStatus"`
+	ServiceStatus int `validate:"oneof=1 2 3 4 5" json:"serviceStatus"`
 }

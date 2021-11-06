@@ -11,7 +11,7 @@ type PriceRate struct {
 	StartingHour  string  `validate:"required" json:"startingHour"`
 	EndingHour    string  `validate:"required" json:"endingHour"`
 	Price         float64 `validate:"numeric" json:"price"`
-	KindOfService int     `validate:"oneof=0 1 2 3 4" json:"kindOfService"`
+	KindOfService int     `validate:"oneof=1 2 3 4 5" json:"kindOfService"`
 	CityID        string  `validate:"required,uuid4" json:"cityId"`
 	WorkingDays   []int   `validate:"required"json:"workingDays"`
 }

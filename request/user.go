@@ -11,9 +11,9 @@ type User struct {
 	LastName     string `validate:"required,max=100,alpha"`
 	EmailAddress string `validate:"required,email,max=254"`
 	Password     string `validate:"required,min=8,securepass,max=150"`
-	UserType     int    `validate:"oneof=0 1"`
+	UserType     int    `validate:"oneof=1 2"`
 	StateID      string `validate:"required,uuid4"`
-	BusinessName string `validate:"required_if=UserType 0"`
+	BusinessName string `validate:"required_if=UserType 1"`
 }
 
 func (u *User) ToEntity() (sr *entity.ServiceRequester, sp *entity.ServiceProvider, err error) {
