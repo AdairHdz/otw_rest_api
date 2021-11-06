@@ -335,3 +335,49 @@ func priceRatesCollide(newPriceRate request.PriceRate, priceRates []entity.Price
 	}
 	return
 }
+
+func (PriceRateController) Delete() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		providerId := context.Param("serviceProviderId")
+		_, err := uuid.FromString(providerId)
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The providerId you provided has an invalid format",
+			})
+			return
+		}
+
+		priceRateId := context.Param("priceRateId")
+		_, err = uuid.FromString(priceRateId)
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The priceRateId you provided has an invalid format",
+			})
+			return
+		}
+
+		var priceRate entity.PriceRate
+
+		db, err := database.New()
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+		
+		r := db.Where("id = ? ", priceRateId).Where("service_provider_id = ?", providerId).Delete(&priceRate)
+		if r.RowsAffected == 0 {
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not Found",
+				Message: "There is not a price rate or service provider with the ID you provided.",
+			})
+			return
+		}	
+
+		context.Status(http.StatusNoContent)
+	}
+}
