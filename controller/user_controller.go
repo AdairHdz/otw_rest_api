@@ -10,6 +10,7 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/mapper"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	uuid "github.com/satori/go.uuid"
 )
 
 type UserController struct{}
@@ -90,5 +91,136 @@ func (UserController) Store() gin.HandlerFunc {
 			res = mapper.CreateProviderAddAsResponse(serviceProvider)
 		}	
 		context.JSON(http.StatusOK, res)
+	}
+}
+
+func (UserController) SendEmail() gin.HandlerFunc {
+	return func(context *gin.Context) {	
+		userId := context.Param("userId")
+		_, err := uuid.FromString(userId)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
+			return
+		}
+
+		requestData := struct {
+			EmailAddress string `json:"emailAddress" validate:"required,email,max=254"`
+		}{}
+
+		err = context.BindJSON(&requestData)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Input",
+				Message: "Please make sure you've entered the required fields in the specified format. For more details, check the API documentation",
+			})
+			return
+		}
+
+		v := utility.NewValidator()				
+
+		err = v.Struct(requestData)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Input",
+				Message: "Please make sure you've entered the required fields in the specified format. For more details, check the API documentation",
+			})
+			return
+		}	
+		
+		db, err := database.New()
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		verificationCode := utility.GenerateCode()
+
+		r := db.Model(&entity.Account{}).Where("email_address = ?", requestData.EmailAddress).
+			Where("user_id = ?", userId).Where("verified = false").Update("verification_code", verificationCode)
+
+		if r.RowsAffected == 0 {
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not found",
+				Message: "There are no users with that id, email or he is already verified.",
+			})
+			return
+		}
+
+		err = utility.SendToEmail(requestData.EmailAddress, verificationCode)
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+	
+		context.Status(http.StatusOK)
+	}
+}
+
+func (UserController) Verify() gin.HandlerFunc {
+	return func(context *gin.Context) {	
+		userId := context.Param("userId")
+		_, err := uuid.FromString(userId)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
+			return
+		}
+
+		requestData := struct {
+			Code string `json:"verificationCode" validate:"required,max=8"`
+		}{}
+
+		err = context.BindJSON(&requestData)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Input",
+				Message: "Please make sure you've entered the required fields in the specified format. For more details, check the API documentation",
+			})
+			return
+		}
+
+		v := utility.NewValidator()				
+
+		err = v.Struct(requestData)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Input",
+				Message: "Please make sure you've entered the required fields in the specified format. For more details, check the API documentation",
+			})
+			return
+		}	
+		
+		db, err := database.New()
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		r := db.Model(&entity.Account{}).Where("verification_code = ?", requestData.Code).
+			Where("user_id = ?", userId).Update("verified", true)
+
+		if r.RowsAffected == 0 {
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not found",
+				Message: "There are no users with that id or the verification code is incorrect.",
+			})
+			return
+		}
+	
+		context.Status(http.StatusOK)
 	}
 }
