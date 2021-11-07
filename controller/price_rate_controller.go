@@ -341,7 +341,7 @@ func (PriceRateController) Delete() gin.HandlerFunc {
 		providerId := context.Param("serviceProviderId")
 		_, err := uuid.FromString(providerId)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The providerId you provided has an invalid format",
 			})
@@ -351,7 +351,7 @@ func (PriceRateController) Delete() gin.HandlerFunc {
 		priceRateId := context.Param("priceRateId")
 		_, err = uuid.FromString(priceRateId)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The priceRateId you provided has an invalid format",
 			})
