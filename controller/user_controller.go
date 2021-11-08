@@ -88,14 +88,7 @@ func (UserController) Store() gin.HandlerFunc {
 			return
 		}
 
-		err = utility.SendToEmail(requestData.EmailAddress, verificationCode)
-		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
-				Message: "There was an unexpected error while processing your data. Please try again later",
-			})
-			return
-		}
+		go utility.SendToEmail(requestData.EmailAddress, verificationCode)		
 
 		res := response.User{}
 		if serviceRequester != nil {
@@ -165,16 +158,9 @@ func (UserController) SendEmail() gin.HandlerFunc {
 			return
 		}
 
-		err = utility.SendToEmail(requestData.EmailAddress, verificationCode)
-		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
-				Message: "There was an unexpected error while processing your data. Please try again later",
-			})
-			return
-		}
+		go utility.SendToEmail(requestData.EmailAddress, verificationCode)		
 	
-		context.Status(http.StatusOK)
+		context.Status(http.StatusNoContent)
 	}
 }
 
@@ -234,6 +220,6 @@ func (UserController) Verify() gin.HandlerFunc {
 			return
 		}
 	
-		context.Status(http.StatusOK)
+		context.Status(http.StatusNoContent)
 	}
 }
