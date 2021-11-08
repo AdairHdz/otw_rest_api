@@ -69,14 +69,27 @@ func (UserController) Store() gin.HandlerFunc {
 			return
 		}
 
+		verificationCode := utility.GenerateCode()
+
 		var result *gorm.DB
 		if serviceRequester != nil {
+			serviceRequester.User.Account.VerificationCode = verificationCode
 			result = db.Create(&serviceRequester)
 		} else if serviceProvider != nil {
+			serviceProvider.User.Account.VerificationCode = verificationCode
 			result = db.Create(&serviceProvider)
 		}						
 
 		if result.Error != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		err = utility.SendToEmail(requestData.EmailAddress, verificationCode)
+		if err != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
 				Error: "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
