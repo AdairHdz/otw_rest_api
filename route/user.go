@@ -14,4 +14,7 @@ func init() {
 func AppendUserRoutes(r *gin.Engine) {
 	u := r.Group("/users")	
 	u.POST("", userController.Store())
+
+	u.PUT("/:userId/verify", userController.SendEmail())
+	u.PATCH("/:userId/verify", userController.Verify())
 }
