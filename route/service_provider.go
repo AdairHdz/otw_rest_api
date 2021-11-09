@@ -25,6 +25,7 @@ func AppendToServiceProviderRoutes(r *gin.Engine) {
 	sp.GET("/:serviceProviderId", serviceProviderController.GetWithId())
 
 	sp.GET("/:serviceProviderId/reviews", reviewController.GetWithId())
+	sp.GET("/:serviceProviderId/statistics", serviceProviderController.GetStatistics())
 
 	sp.GET("/:serviceProviderId/priceRates", priceRateController.FindAll())
 	sp.POST("/:serviceProviderId/priceRates", priceRateController.Store())
