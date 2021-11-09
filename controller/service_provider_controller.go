@@ -283,9 +283,19 @@ func (ServiceProviderController) GetStatistics() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		startingDate := context.Query("startingDate")
 		endingDate := context.Query("endingDate")
-		providerId := context.Param("providerId")		
+		providerID := context.Param("serviceProviderId")		
 
-		_, err := time.Parse("2006-01-02", startingDate)
+		_, err := uuid.FromString(providerID)
+
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Invalid ID",
+				Message: "The ID you provided has an invalid format",
+			})
+			return
+		}
+
+		_, err = time.Parse("2006-01-02", startingDate)
 		if err != nil {
 			context.AbortWithStatusJSON(http.StatusBadRequest, "The starting date you provided has a non-valid format.")
 			return
@@ -295,19 +305,25 @@ func (ServiceProviderController) GetStatistics() gin.HandlerFunc {
 		if err != nil {
 			context.AbortWithStatusJSON(http.StatusBadRequest, "The ending date you provided has a non-valid format.")
 			return
+		}		
+
+		type RequestedServicesPerWeekdayqueryResult struct {
+			RequestedServices int `json:"requestedServices"`
+			Weekday           int `json:"weekday"`
 		}
 
-		statisticsReport := struct {
-			RequestedServicesPerWeekdayqueryResult []struct {
-				RequestedServices int `json:"requestedServices"`
-				Weekday           int `json:"weekday"`
-			} `json:"requestedServicesPerWeekday"`
+		type KindOfServicesQueryResult struct {
+			RequestedServices int `json:"requestedServices"`
+			KindOfService     int `json:"kindOfService"`
+		}
+		
+		type Statistics struct {
+			RequestedServicesPerWeekdayqueryResult []RequestedServicesPerWeekdayqueryResult `json:"requestedServicesPerWeekday"`
+			KindOfServicesQueryResult []KindOfServicesQueryResult `json:"requestedServicesPerKindOfService"`
+		}
 
-			KindOfServicesQueryResult []struct {
-				RequestedServices int `json:"requestedServices"`
-				KindOfService     int `json:"kindOfService"`
-			} `json:"requestedServicesPerKindOfService"`
-		}{}
+		var kindOfServicesQueryResult []KindOfServicesQueryResult
+		var requestedServicesPerWeekdayqueryResult []RequestedServicesPerWeekdayqueryResult
 
 		db, err := database.New()
 		if err != nil {
@@ -316,19 +332,27 @@ func (ServiceProviderController) GetStatistics() gin.HandlerFunc {
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
-		}
+		}		
 
 		r := db.Raw("SELECT COUNT(`id`) AS 'requested_services', "+
-		"WEEKDAY(DATE(`date`)) AS 'weekday' "+
+		"(WEEKDAY(DATE(`date`)) + 1) AS 'weekday' "+
 		"FROM service_requests "+
 		"WHERE service_provider_id = ? AND DATEDIFF(?, `date`) <= 0 "+
 		"AND DATEDIFF(?, `date`) >= 0 "+
-		"GROUP BY WEEKDAY(DATE(`date`));", providerId, startingDate, endingDate).Scan(&statisticsReport.KindOfServicesQueryResult)
+		"GROUP BY (WEEKDAY(DATE(`date`)) + 1)", providerID, startingDate, endingDate).Scan(&requestedServicesPerWeekdayqueryResult)
 
 		if r.Error != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
 				Error: "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		if r.RowsAffected == 0 {
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not Found",
+				Message: "We were unable to retrieve info about the dates you specified",
 			})
 			return
 		}
@@ -339,7 +363,7 @@ func (ServiceProviderController) GetStatistics() gin.HandlerFunc {
 		"WHERE service_provider_id = ? "+
 		"AND DATEDIFF(?, `date`) <= 0 "+
 		"AND DATEDIFF(?, `date`) >= 0 "+
-		"GROUP BY(`kind_of_service`);", providerId, startingDate, endingDate).Scan(&statisticsReport.RequestedServicesPerWeekdayqueryResult)
+		"GROUP BY(`kind_of_service`)", providerID, startingDate, endingDate).Scan(&kindOfServicesQueryResult)
 
 		if r.Error != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
@@ -348,7 +372,20 @@ func (ServiceProviderController) GetStatistics() gin.HandlerFunc {
 			})
 			return
 		}
-		
+
+		if r.RowsAffected == 0 {
+			context.JSON(http.StatusNotFound, response.ErrorResponse {
+				Error: "Not Found",
+				Message: "We were unable to retrieve info about the dates you specified",
+			})
+			return
+		}
+
+		statisticsReport := Statistics {
+			RequestedServicesPerWeekdayqueryResult: requestedServicesPerWeekdayqueryResult,
+			KindOfServicesQueryResult: kindOfServicesQueryResult,
+		}
+
 		context.JSON(http.StatusOK, statisticsReport)
 	}
 }
