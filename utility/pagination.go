@@ -1,6 +1,9 @@
 package utility
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"math"
+)
 
 func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
@@ -18,4 +21,12 @@ func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
 		offset := (page - 1) * pageSize
 		return db.Offset(offset).Limit(pageSize)
 	}
+}
+
+func Roundf(x float64) float64 {
+	t := math.Trunc(x)
+	if math.Abs(x-t) >= 0.0001 {
+		return t + math.Copysign(1, x)
+	}
+	return t
 }

@@ -10,7 +10,7 @@ import (
 type PriceRate struct {
 	StartingHour  string  `validate:"required" json:"startingHour"`
 	EndingHour    string  `validate:"required" json:"endingHour"`
-	Price         float64 `validate:"numeric" json:"price"`
+	Price         float64 `validate:"numeric,gt=0" json:"price"`
 	KindOfService int     `validate:"oneof=1 2 3 4 5" json:"kindOfService"`
 	CityID        string  `validate:"required,uuid4" json:"cityId"`
 	WorkingDays   []int   `validate:"required"json:"workingDays"`
