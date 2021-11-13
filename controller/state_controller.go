@@ -45,7 +45,7 @@ func (StateController) IndexCities() gin.HandlerFunc {
 		stateID := context.Param("stateId")
 		_, err := uuid.FromString(stateID)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})

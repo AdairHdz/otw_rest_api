@@ -23,7 +23,7 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 		_, err := uuid.FromString(providerId)
 
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -138,7 +138,7 @@ func (ReviewController) Store() gin.HandlerFunc {
 		_, err := uuid.FromString(providerID)
 
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})

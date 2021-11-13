@@ -27,7 +27,7 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 		providerID := context.Param("serviceProviderId")
 		_, err := uuid.FromString(providerID)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -38,7 +38,7 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 		if context.Query("kindOfService") != "" {
 			kindOfService, err = strconv.Atoi(context.Query("kindOfService"))
 			if err != nil {
-				context.JSON(http.StatusConflict, response.ErrorResponse {
+				context.JSON(http.StatusBadRequest, response.ErrorResponse {
 					Error: "Bad Request",
 					Message: "Invalid kind of service parameter",
 				})
@@ -50,7 +50,7 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 		if cityID != "" {
 		_, err = uuid.FromString(cityID)
 			if err != nil {
-				context.JSON(http.StatusConflict, response.ErrorResponse {
+				context.JSON(http.StatusBadRequest, response.ErrorResponse {
 					Error: "Invalid ID",
 					Message: "The city ID you provided has an invalid format",
 				})
@@ -101,7 +101,7 @@ func (PriceRateController) FindActivePriceRate() gin.HandlerFunc {
 
 		_, err := uuid.FromString(providerID)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -112,7 +112,7 @@ func (PriceRateController) FindActivePriceRate() gin.HandlerFunc {
 
 		_, err = uuid.FromString(cityID)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -123,7 +123,7 @@ func (PriceRateController) FindActivePriceRate() gin.HandlerFunc {
 		if context.Query("kindOfService") != "" {
 			kindOfService, err = strconv.Atoi(context.Query("kindOfService"))
 			if err != nil {
-				context.JSON(http.StatusConflict, response.ErrorResponse {
+				context.JSON(http.StatusBadRequest, response.ErrorResponse {
 					Error: "Bad Request",
 					Message: "Invalid kind of service parameter",
 				})
@@ -197,7 +197,7 @@ func (PriceRateController) Store() gin.HandlerFunc {
 
 		_, err := uuid.FromString(providerID)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -206,7 +206,7 @@ func (PriceRateController) Store() gin.HandlerFunc {
 
 		err = context.BindJSON(&priceRate)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Input",
 				Message: "Please make sure you send valid data",
 			})

@@ -23,7 +23,7 @@ func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 		providerID := context.Param("serviceProviderId")
 		_, err := uuid.FromString(providerID)		
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -126,7 +126,7 @@ func (ServiceProviderController) GetWithId() gin.HandlerFunc {
 		_, err := uuid.FromString(providerID)
 
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -347,7 +347,7 @@ func (ServiceProviderController) GetStatistics() gin.HandlerFunc {
 		_, err := uuid.FromString(providerID)
 
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
