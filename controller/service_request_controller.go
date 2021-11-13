@@ -252,7 +252,7 @@ func (RequestController) StoreStatus() gin.HandlerFunc {
 			return
 		}		
 
-		context.Status(http.StatusNoContent)
+		context.Status(http.StatusOK)
 	}
 
 }
