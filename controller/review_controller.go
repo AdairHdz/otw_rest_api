@@ -115,10 +115,10 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 				Prev  string `json:"prev"`
 				Next  string `json:"next"`
 			}{
-				First: fmt.Sprintf("providers/%s/reviews?page=%d&pagesize=%d", providerId, 1, pageElements),
-				Last:  fmt.Sprintf("providers/%s/reviews?page=%d&pagesize=%d", providerId, lastPage, pageElements),
-				Prev:  fmt.Sprintf("providers/%s/reviews?page=%d&pagesize=%d", providerId, previousPage, pageElements),
-				Next:  fmt.Sprintf("providers/%s/reviews?page=%d&pagesize=%d", providerId, nextPage, pageElements),
+				First: fmt.Sprintf("providers/%s/reviews?page=%d&pageSize=%d", providerId, 1, pageElements),
+				Last:  fmt.Sprintf("providers/%s/reviews?page=%d&pageSize=%d", providerId, lastPage, pageElements),
+				Prev:  fmt.Sprintf("providers/%s/reviews?page=%d&pageSize=%d", providerId, previousPage, pageElements),
+				Next:  fmt.Sprintf("providers/%s/reviews?page=%d&pageSize=%d", providerId, nextPage, pageElements),
 			},
 			Page:    page,
 			Pages:   lastPage,
