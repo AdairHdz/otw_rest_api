@@ -160,7 +160,7 @@ func (UserController) SendEmail() gin.HandlerFunc {
 
 		go utility.SendToEmail(requestData.EmailAddress, verificationCode)		
 	
-		context.Status(http.StatusNoContent)
+		context.Status(http.StatusOK)
 	}
 }
 

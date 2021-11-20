@@ -203,7 +203,7 @@ func (RequestController) StoreStatus() gin.HandlerFunc {
 		if err != nil {
 			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Input",
-				Message: "Please make sure you have entered a correct service status. Correct values 0,1,2,3,4",
+				Message: "Please make sure you have entered a correct service status. Correct values 1,2,3,4,5",
 			})
 			return
 		}
@@ -215,7 +215,7 @@ func (RequestController) StoreStatus() gin.HandlerFunc {
 		if err != nil {
 			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Input",
-				Message: "Please make sure you have entered a correct service status. Correct values 0,1,2,3,4",
+				Message: "Please make sure you have entered a correct service status. Correct values 1,2,3,4,5",
 			})
 			return
 		}
@@ -231,6 +231,17 @@ func (RequestController) StoreStatus() gin.HandlerFunc {
 
 		request := entity.ServiceRequest{}
 
+		isCancelEnd := db.Where("id = ?", requestId).Where("status = ?", entity.CANCELED).
+		Or("status = ?", entity.CONCLUDED).Find(&entity.ServiceRequest{})
+
+		if isCancelEnd.RowsAffected != 0 {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Conflict",
+				Message: "The service request is canceled or concluded. You cannot change the state to another.",
+			})
+			return
+		}	
+
 		r := db.Model(&request).Where("id = ?", requestId).Update( "status" , requestData.ServiceStatus)
 
 		if r.RowsAffected == 0 {
@@ -241,7 +252,7 @@ func (RequestController) StoreStatus() gin.HandlerFunc {
 			return
 		}		
 
-		context.Status(http.StatusNoContent)
+		context.Status(http.StatusOK)
 	}
 
 }
