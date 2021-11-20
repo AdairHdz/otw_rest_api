@@ -21,7 +21,7 @@ func (AddressController) Store() gin.HandlerFunc {
 		requesterID := context.Param("serviceRequesterId")
 		_, err := uuid.FromString(requesterID)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -86,20 +86,20 @@ func (AddressController) Store() gin.HandlerFunc {
 func (AddressController) Index() gin.HandlerFunc {
 	return func(context *gin.Context) {
 
-		requester_id := context.Param("serviceRequesterId")
-		_, err := uuid.FromString(requester_id)
+		requesterId := context.Param("serviceRequesterId")
+		_, err := uuid.FromString(requesterId)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The RequesterId you provided has an invalid format",
 			})
 			return
 		}
 
-		city_id := context.Query("cityId")
-		_, err = uuid.FromString(city_id)
+		cityId := context.Query("cityId")
+		_, err = uuid.FromString(cityId)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The CityId you provided has an invalid format",
 			})
@@ -117,7 +117,7 @@ func (AddressController) Index() gin.HandlerFunc {
 			return
 		}
 
-		r:= db.Where("city_id=? AND service_requester_id=?", city_id, requester_id).Find(&addresses)
+		r:= db.Where("city_id=? AND service_requester_id=?", cityId, requesterId).Find(&addresses)
 
 		if r.RowsAffected == 0 {
 			context.JSON(http.StatusNotFound, response.ErrorResponse {

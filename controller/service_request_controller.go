@@ -85,7 +85,7 @@ func (RequestController) GetRequestRequester() gin.HandlerFunc {
 		_, err := uuid.FromString(requesterId)
 
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -96,7 +96,7 @@ func (RequestController) GetRequestRequester() gin.HandlerFunc {
 		_, err = uuid.FromString(requestId)
 
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -137,7 +137,7 @@ func (RequestController) GetRequestProvider() gin.HandlerFunc {
 		_, err := uuid.FromString(providerId)
 
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -148,7 +148,7 @@ func (RequestController) GetRequestProvider() gin.HandlerFunc {
 		_, err = uuid.FromString(requestId)
 
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -190,7 +190,7 @@ func (RequestController) StoreStatus() gin.HandlerFunc {
 		_, err := uuid.FromString(requestId)
 
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -253,7 +253,7 @@ func (RequestController) IndexRequestProvider() gin.HandlerFunc {
 		_, err := uuid.FromString(providerId)
 
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -263,7 +263,7 @@ func (RequestController) IndexRequestProvider() gin.HandlerFunc {
 		date := context.Query("date")
 		_, err = time.Parse("2006-01-02", date)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid date",
 				Message: "The date format you provided is not valid.",
 			})
@@ -306,7 +306,7 @@ func (RequestController) IndexRequestRequester() gin.HandlerFunc {
 		_, err := uuid.FromString(requesterId)
 
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
@@ -316,7 +316,7 @@ func (RequestController) IndexRequestRequester() gin.HandlerFunc {
 		date := context.Query("date")
 		_, err = time.Parse("2006-01-02", date)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Invalid date",
 				Message: "The date format you provided is not valid.",
 			})
