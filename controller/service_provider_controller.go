@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
-
+	"fmt"
 	"github.com/AdairHdz/OTW-Rest-API/database"
 	"github.com/AdairHdz/OTW-Rest-API/entity"
 	"github.com/AdairHdz/OTW-Rest-API/mapper"
@@ -189,7 +189,7 @@ func (ServiceProviderController) GetWithId() gin.HandlerFunc {
 func (ServiceProviderController) Index() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		page, err := strconv.Atoi(context.Query("page"))
-		if err != nil {
+		if err != nil || page > 50 || page <= 0 {
 			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Request",
 				Message: "Invalid page parameter.",
@@ -198,7 +198,7 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 		}
 
 		pageElements, err := strconv.Atoi(context.Query("pageSize"))
-		if err != nil {
+		if err != nil || pageElements > 50 || pageElements <= 0 {
 			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Request",
 				Message: "Invalid page size parameter.",
@@ -206,33 +206,28 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 			return
 		}
 
-		kindOfService := 0
-		if context.Query("kindOfService") != "" {
-			kindOfService, err = strconv.Atoi(context.Query("kindOfService"))
-			if err != nil {
-				context.JSON(http.StatusBadRequest, response.ErrorResponse {
-					Error: "Bad Request",
-					Message: "Invalid kind of service parameter.",
-				})
-				return
-			}
-		} 
+		kindOfService, err := strconv.Atoi(context.Query("kindOfService"))
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Request",
+				Message: "Invalid kind of service parameter.",
+			})
+			return
+		}
+		
 
-		price := 0.0000
-		if context.Query("maxPriceRate") != "" {
-			maxPriceRateValid, err := strconv.ParseFloat(context.Query("maxPriceRate"), 64)
-			if err != nil || maxPriceRateValid <= 0.0000 {
-				context.JSON(http.StatusBadRequest, response.ErrorResponse {
-					Error: "Bad Request",
-					Message: "Invalid price rate parameter.",
-				})
-				return
-			}
-			price = maxPriceRateValid
-		} 
+		price, err := strconv.ParseFloat(context.Query("maxPriceRate"), 64)
+		if err != nil || price <= 0.0000 {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Request",
+				Message: "Invalid price rate parameter.",
+			})
+			return
+		}
+		
 
-		cityID := context.Query("cityId")
-		_, err = uuid.FromString(cityID)
+		cityId := context.Query("cityId")
+		_, err = uuid.FromString(cityId)
 			if err != nil {
 				context.JSON(http.StatusBadRequest, response.ErrorResponse {
 					Error: "Invalid ID",
@@ -243,7 +238,7 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 
 		filters := &FiltersKindOfServiceAndCity{
 			KindOfService: kindOfService,
-			CityID: cityID,
+			CityID: cityId,
 		}
 		
 
@@ -283,7 +278,63 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 		for _, price_rate := range price_rates {
 			result = append(result, mapper.CreateServiceProvidersAsResponse(price_rate))
 		}
-		context.JSON(http.StatusOK, result)
+
+		var rowCount int64
+		db.Model(&entity.PriceRate{}).Where("price_rates.price <= ?", price).
+		Where(filters).Where("? >= price_rates.starting_hour AND ? < price_rates.ending_hour", hour, hour).
+		Where("price_rates.id IN (?)", db.Table("pricerate_workingdays").Select("price_rate_id").
+		Where("pricerate_workingdays.price_rate_id = price_rates.id")).Count(&rowCount)
+
+		round := float64(rowCount) / float64(pageElements)
+		
+		lastPage := int(utility.Roundf(round))
+		
+		var previousPage int = 1
+		var nextPage int
+
+		if page-1 > 1 {
+			previousPage = page - 1
+		}
+
+		if page+1 <= lastPage {
+			nextPage = page + 1
+		} else {
+			nextPage = lastPage
+		}
+
+		dataResponse := struct {
+			Links struct {
+				First string `json:"first"`
+				Last  string `json:"last"`
+				Prev  string `json:"prev"`
+				Next  string `json:"next"`
+			} `json:"links"`
+			Page    int                                    `json:"page"`
+			Pages   int                                    `json:"pages"`
+			PerPage int                                    `json:"perPage"`
+			Total   int64                                  `json:"total"`
+			Data    []response.ServiceProvider		  	   `json:"data"`
+		}{
+			Links: struct {
+				First string `json:"first"`
+				Last  string `json:"last"`
+				Prev  string `json:"prev"`
+				Next  string `json:"next"`
+			}{
+				First: fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&cityId=%s&page=%d&pageSize=%d", price, kindOfService, cityId, 1, pageElements),
+				Last:  fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&cityId=%s&page=%d&pageSize=%d", price, kindOfService, cityId, lastPage, pageElements),
+				Prev:  fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&cityId=%s&page=%d&pageSize=%d", price, kindOfService, cityId, previousPage, pageElements),
+				Next:  fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&cityId=%s&page=%d&pageSize=%d", price, kindOfService, cityId, nextPage, pageElements),
+			},
+			Page:    page,
+			Pages:   lastPage,
+			PerPage: pageElements,
+			Total:   rowCount,
+			Data:    result,
+		}
+		context.JSON(http.StatusOK, dataResponse)
+
+		
 	}
 }
 

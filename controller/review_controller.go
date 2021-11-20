@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
-
 	"github.com/AdairHdz/OTW-Rest-API/database"
 	"github.com/AdairHdz/OTW-Rest-API/entity"
 	"github.com/AdairHdz/OTW-Rest-API/mapper"
@@ -20,8 +19,8 @@ type ReviewController struct{}
 
 func (ReviewController) GetWithId() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		providerID := context.Param("serviceProviderId")
-		_, err := uuid.FromString(providerID)
+		providerId := context.Param("serviceProviderId")
+		_, err := uuid.FromString(providerId)
 
 		if err != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
@@ -32,7 +31,7 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 		}
 
 		page, err := strconv.Atoi(context.Query("page"))
-		if err != nil {
+		if err != nil || page > 50 || page <= 0 {
 			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Request",
 				Message: "Invalid page parameter.",
@@ -41,7 +40,7 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 		}
 
 		pageElements, err := strconv.Atoi(context.Query("pageSize"))
-		if err != nil {
+		if err != nil || pageElements > 50 || pageElements <= 0 {
 			context.JSON(http.StatusBadRequest, response.ErrorResponse {
 				Error: "Bad Request",
 				Message: "Invalid page elements parameter.",
@@ -59,8 +58,10 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 			})
 			return
 		}
+
+		r := db.Scopes(utility.Paginate(page, pageElements)).Preload("ServiceRequester.User").Preload("Evidences").
+		Where("service_provider_id = ?", providerId).Find(&reviews)
 		
-		r := db.Scopes(utility.Paginate(page, pageElements)).Preload("ServiceRequester.User").Preload("Evidences").Where("service_provider_id = ?", providerID).Find(&reviews)
 		if r.RowsAffected == 0 {
 			context.JSON(http.StatusNotFound, response.ErrorResponse {
 				Error: "Not found",
@@ -68,6 +69,9 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 			})
 			return
 		}	
+		
+		var rowCount int64
+		db.Model(&entity.Review{}).Where("service_provider_id = ?", providerId).Count(&rowCount)
 
 		result := []response.ReviewWithEvidence{}
 		
@@ -75,7 +79,54 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 			result = append(result, mapper.CreateReviewWithEvidenceAsResponse(review))
 		}
 
-		context.JSON(http.StatusOK, result)
+		round := float64(rowCount) / float64(pageElements)
+		
+		lastPage := int(utility.Roundf(round))
+		
+		var previousPage int = 1
+		var nextPage int
+
+		if page-1 > 1 {
+			previousPage = page - 1
+		}
+
+		if page+1 <= lastPage {
+			nextPage = page + 1
+		} else {
+			nextPage = lastPage
+		}
+
+		dataResponse := struct {
+			Links struct {
+				First string `json:"first"`
+				Last  string `json:"last"`
+				Prev  string `json:"prev"`
+				Next  string `json:"next"`
+			} `json:"links"`
+			Page    int                                    `json:"page"`
+			Pages   int                                    `json:"pages"`
+			PerPage int                                    `json:"perPage"`
+			Total   int64                                  `json:"total"`
+			Data    []response.ReviewWithEvidence		   `json:"data"`
+		}{
+			Links: struct {
+				First string `json:"first"`
+				Last  string `json:"last"`
+				Prev  string `json:"prev"`
+				Next  string `json:"next"`
+			}{
+				First: fmt.Sprintf("providers/%s/reviews?page=%d&pageSize=%d", providerId, 1, pageElements),
+				Last:  fmt.Sprintf("providers/%s/reviews?page=%d&pageSize=%d", providerId, lastPage, pageElements),
+				Prev:  fmt.Sprintf("providers/%s/reviews?page=%d&pageSize=%d", providerId, previousPage, pageElements),
+				Next:  fmt.Sprintf("providers/%s/reviews?page=%d&pageSize=%d", providerId, nextPage, pageElements),
+			},
+			Page:    page,
+			Pages:   lastPage,
+			PerPage: pageElements,
+			Total:   rowCount,
+			Data:    result,
+		}
+		context.JSON(http.StatusOK, dataResponse)
 
 	}
 

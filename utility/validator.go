@@ -52,7 +52,7 @@ func securePassword(fl validator.FieldLevel) bool {
 
 func alpha(fl validator.FieldLevel) bool {
 	fieldValue := fl.Field().String()	
-	matches, err := regexp.MatchString(`^[^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{1,}$`, fieldValue)
+	matches, err := regexp.MatchString(`^\S[^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{1,}$`, fieldValue)
 	if err != nil {
 		return false
 	}
@@ -62,7 +62,7 @@ func alpha(fl validator.FieldLevel) bool {
 
 func alphaNumericRegexString(fl validator.FieldLevel) bool {
 	fieldValue := fl.Field().String()	
-	matches, err := regexp.MatchString(`^\S[À-ÿA-Za-z0-9\s-.&#]+$`, fieldValue)
+	matches, err := regexp.MatchString(`^[À-ÿA-Za-z0-9\s-.&#]+$`, fieldValue)
 	if err != nil {
 		return false
 	}
