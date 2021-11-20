@@ -17,6 +17,12 @@ services:
       - database
     volumes:
       - ./keys:/app/keys
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}      
+      DB_CONTAINER_NAME: ${DB_CONTAINER_NAME}
   database:
     image: "mysql:8.0.26"
     container_name: ${DB_CONTAINER_NAME}
