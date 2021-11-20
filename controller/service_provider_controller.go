@@ -321,10 +321,10 @@ func (ServiceProviderController) Index() gin.HandlerFunc {
 				Prev  string `json:"prev"`
 				Next  string `json:"next"`
 			}{
-				First: fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&city=%s&page=%d&pagesize=%d", price, kindOfService, cityId, 1, pageElements),
-				Last:  fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&city=%s&page=%d&pagesize=%d", price, kindOfService, cityId, lastPage, pageElements),
-				Prev:  fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&city=%s&page=%d&pagesize=%d", price, kindOfService, cityId, previousPage, pageElements),
-				Next:  fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&city=%s&page=%d&pagesize=%d", price, kindOfService, cityId, nextPage, pageElements),
+				First: fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&cityId=%s&page=%d&pageSize=%d", price, kindOfService, cityId, 1, pageElements),
+				Last:  fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&cityId=%s&page=%d&pageSize=%d", price, kindOfService, cityId, lastPage, pageElements),
+				Prev:  fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&cityId=%s&page=%d&pageSize=%d", price, kindOfService, cityId, previousPage, pageElements),
+				Next:  fmt.Sprintf("providers?maxPriceRate=%.2f&kindOfService=%d&cityId=%s&page=%d&pageSize=%d", price, kindOfService, cityId, nextPage, pageElements),
 			},
 			Page:    page,
 			Pages:   lastPage,
