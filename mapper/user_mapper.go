@@ -8,6 +8,7 @@ import (
 func CreateProviderAddAsResponse(provider *entity.ServiceProvider) response.User{
 	r := response.User {
 		ID: provider.User.ID,
+		SpecificUserID: provider.ID,
 		Names: provider.User.Names,
 		LastName: provider.User.Lastname,
 		EmailAddress: provider.User.Account.EmailAddress,
@@ -20,6 +21,7 @@ func CreateProviderAddAsResponse(provider *entity.ServiceProvider) response.User
 func CreateRequesterAddAsResponse(requester *entity.ServiceRequester) response.User{
 	r := response.User {
 		ID: requester.User.ID,
+		SpecificUserID: requester.ID,
 		Names: requester.User.Names,
 		LastName: requester.User.Lastname,
 		EmailAddress: requester.User.Account.EmailAddress,
