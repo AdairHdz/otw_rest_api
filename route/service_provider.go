@@ -25,18 +25,17 @@ func AppendToServiceProviderRoutes(r *gin.Engine) {
 	
 	sp.Use(middleware.Authentication())
 	sp.GET("/:serviceProviderId", serviceProviderController.GetWithId())	
-	sp.GET("/:serviceProviderId/reviews", reviewController.GetWithId())
-	sp.GET("/:serviceProviderId/statistics", serviceProviderController.GetStatistics())
-
+	sp.GET("/:serviceProviderId/reviews", reviewController.GetWithId())	
 	sp.GET("/:serviceProviderId/priceRates", priceRateController.FindAll())
-	sp.POST("/:serviceProviderId/priceRates", priceRateController.Store())
-	sp.DELETE("/:serviceProviderId/priceRates/:priceRateId", priceRateController.Delete())
-
 	sp.POST("/:serviceProviderId/reviews", reviewController.Store())
 	sp.POST("/:serviceProviderId/reviews/:reviewId/evidence", reviewController.UploadEvidence())
 	sp.GET("/:serviceProviderId/priceRates/:cityId", priceRateController.FindActivePriceRate())
 	sp.GET("", serviceProviderController.Index())
 
+	sp.Use(middleware.ServiceProviderAuthorization())
+	sp.GET("/:serviceProviderId/statistics", serviceProviderController.GetStatistics())
+	sp.POST("/:serviceProviderId/priceRates", priceRateController.Store())
+	sp.DELETE("/:serviceProviderId/priceRates/:priceRateId", priceRateController.Delete())			
 	sp.GET("/:serviceProviderId/requests/:serviceRequestId", requestController.GetRequestProvider())
 	sp.GET("/:serviceProviderId/requests", requestController.IndexRequestProvider())
 }

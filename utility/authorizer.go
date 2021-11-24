@@ -1,10 +1,12 @@
 package utility
 
 import (
-	"github.com/golang-jwt/jwt/v4"
+	"crypto/rsa"
+	"errors"
+	"io/ioutil"
 	"time"
-	"crypto/rsa"	
-	"io/ioutil"		
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type CustomClaims struct {
@@ -68,16 +70,34 @@ func SignString(userID string, userType int, emailAddress string, duration time.
 func ValidateSignedString(signedString string) bool {
 	token, err := jwt.ParseWithClaims(signedString, &CustomClaims{}, func(jwtToken *jwt.Token) (interface{}, error) {
 		return publicKey, nil
-	})
+	})	
 
 	if err != nil {
 		return false
 	}
 	
-	if _, ok := token.Claims.(*CustomClaims); !ok || token.Valid {
+	if _, ok := token.Claims.(*CustomClaims); !ok || !token.Valid {
 		return false
 	}
 
 	return true
+}
+
+func ExtractCustomClaims(signedString string) (string, error) {
+	token, err := jwt.ParseWithClaims(signedString, &CustomClaims{}, func(jwtToken *jwt.Token) (interface{}, error) {
+		return publicKey, nil
+	})
+
+	if err != nil {
+		return "", errors.New("invalid signed string")
+	}
+
+	claims, ok := token.Claims.(*CustomClaims)
+
+	if !ok || !token.Valid {
+		return "", errors.New("invalid signed string")
+	}	
+
+	return claims.UserID, nil
 }
 
