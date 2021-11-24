@@ -1,8 +1,9 @@
 package route
 
 import (
-	"github.com/gin-gonic/gin"	
 	"github.com/AdairHdz/OTW-Rest-API/controller"
+	"github.com/AdairHdz/OTW-Rest-API/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 var userController controller.UserController
@@ -14,7 +15,9 @@ func init() {
 func AppendUserRoutes(r *gin.Engine) {
 	u := r.Group("/users")	
 	u.POST("", userController.Store())
+	u.POST("/login", userController.Login())
 
+	u.Use(middleware.Authentication())
 	u.PUT("/:userId/verify", userController.SendEmail())
 	u.PATCH("/:userId/verify", userController.Verify())
 }

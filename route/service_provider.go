@@ -1,8 +1,9 @@
 package route
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/AdairHdz/OTW-Rest-API/controller"
+	"github.com/AdairHdz/OTW-Rest-API/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -22,8 +23,8 @@ func AppendToServiceProviderRoutes(r *gin.Engine) {
 	sp := r.Group("/providers")
 	sp.PUT("/:serviceProviderId/image", serviceProviderController.StoreImage())
 	
-	sp.GET("/:serviceProviderId", serviceProviderController.GetWithId())
-
+	sp.Use(middleware.Authentication())
+	sp.GET("/:serviceProviderId", serviceProviderController.GetWithId())	
 	sp.GET("/:serviceProviderId/reviews", reviewController.GetWithId())
 	sp.GET("/:serviceProviderId/statistics", serviceProviderController.GetStatistics())
 
