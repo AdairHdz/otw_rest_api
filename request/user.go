@@ -14,6 +14,7 @@ type User struct {
 	UserType     int    `validate:"oneof=1 2"`
 	StateID      string `validate:"required,uuid4"`
 	BusinessName string `validate:"required_if=UserType 1"`
+	BusinessPicture string
 }
 
 func (u *User) ToEntity() (sr *entity.ServiceRequester, sp *entity.ServiceProvider, err error) {
@@ -29,6 +30,7 @@ func (u *User) ToEntity() (sr *entity.ServiceRequester, sp *entity.ServiceProvid
 				ID: uuid.NewV4().String(),
 			},
 			BusinessName: u.BusinessName,
+			BusinessPicture: u.BusinessPicture,
 			User: entity.User{
 				EntityUUID: entity.EntityUUID{
 					ID: uuid.NewV4().String(),
