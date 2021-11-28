@@ -9,16 +9,23 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
+const (
+	REFRESH = 1
+	EPHIMERAL = 2
+)
+
 type CustomClaims struct {
 	UserID string
+	SpecificID string
 	UserType int
 	EmailAddress string
 	jwt.RegisteredClaims
+	JWTType int
 }
 
 var (	
 	privateKey *rsa.PrivateKey	
-	publicKey *rsa.PublicKey
+	PublicKey *rsa.PublicKey
 )
 
 func init() {
@@ -40,24 +47,26 @@ func init() {
 		panic(err.Error())
 	}
 
-	publicKey, err = jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
+	PublicKey, err = jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
 
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
-func SignString(userID string, userType int, emailAddress string, duration time.Time) (string, error) {
+func SignString(userID string, specificID string, userType int, emailAddress string, duration time.Time, jwtType int) (string, error) {
 	claims := CustomClaims{
 		userID,
+		specificID,
 		userType,
-		emailAddress,
+		emailAddress,			
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(duration),
 			IssuedAt: jwt.NewNumericDate(time.Now()),
 			Issuer: "OTW-Auth-Server",
 			Subject: userID,
 		},
+		jwtType,
 	}
 	
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
@@ -69,7 +78,7 @@ func SignString(userID string, userType int, emailAddress string, duration time.
 
 func ValidateSignedString(signedString string) bool {
 	token, err := jwt.ParseWithClaims(signedString, &CustomClaims{}, func(jwtToken *jwt.Token) (interface{}, error) {
-		return publicKey, nil
+		return PublicKey, nil
 	})	
 
 	if err != nil {
@@ -83,21 +92,21 @@ func ValidateSignedString(signedString string) bool {
 	return true
 }
 
-func ExtractCustomClaims(signedString string) (string, error) {
+func ExtractCustomClaims(signedString string) (*CustomClaims, error) {
 	token, err := jwt.ParseWithClaims(signedString, &CustomClaims{}, func(jwtToken *jwt.Token) (interface{}, error) {
-		return publicKey, nil
+		return PublicKey, nil
 	})
 
 	if err != nil {
-		return "", errors.New("invalid signed string")
+		return nil, errors.New("invalid signed string")
 	}
 
 	claims, ok := token.Claims.(*CustomClaims)
 
 	if !ok || !token.Valid {
-		return "", errors.New("invalid signed string")
+		return nil, errors.New("invalid signed string")
 	}	
 
-	return claims.UserID, nil
+	return claims, nil
 }
 

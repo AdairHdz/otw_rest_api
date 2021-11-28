@@ -1,9 +1,10 @@
 package controller
 
-import (
+import (	
 	"net/http"
 	"strconv"
 	"time"
+
 	"github.com/AdairHdz/OTW-Rest-API/database"
 	"github.com/AdairHdz/OTW-Rest-API/entity"
 	"github.com/AdairHdz/OTW-Rest-API/mapper"
@@ -14,11 +15,11 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-type FiltersKindOfServiceAndCity struct{
-	KindOfService int
-	CityID string
+type FiltersKindOfServiceAndCity struct {
+	KindOfService     int
+	CityID            string
 	ServiceProviderID string
-} 
+}
 
 type PriceRateController struct{}
 
@@ -27,8 +28,8 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 		providerID := context.Param("serviceProviderId")
 		_, err := uuid.FromString(providerID)
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Invalid ID",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
 			return
@@ -38,29 +39,35 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 		if context.Query("kindOfService") != "" {
 			kindOfService, err = strconv.Atoi(context.Query("kindOfService"))
 			if err != nil {
-				context.JSON(http.StatusBadRequest, response.ErrorResponse {
-					Error: "Bad Request",
+				context.JSON(http.StatusBadRequest, response.ErrorResponse{
+					Error:   "Bad Request",
 					Message: "Invalid kind of service parameter",
-				})
-				return
-			}
-		} 
-
-		cityID := context.Query("cityId")
-		if cityID != "" {
-		_, err = uuid.FromString(cityID)
-			if err != nil {
-				context.JSON(http.StatusBadRequest, response.ErrorResponse {
-					Error: "Invalid ID",
-					Message: "The city ID you provided has an invalid format",
 				})
 				return
 			}
 		}
 
+		cityID := context.Query("cityId")
+		if cityID == "" {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Invalid ID",
+				Message: "The city ID you provided has an invalid format",
+			})
+			return
+		}
+
+		_, err = uuid.FromString(cityID)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Invalid ID",
+				Message: "The city ID you provided has an invalid format",
+			})
+			return
+		}
+
 		filters := &FiltersKindOfServiceAndCity{
-			KindOfService: kindOfService,
-			CityID: cityID,
+			KindOfService:     kindOfService,
+			CityID:            cityID,
 			ServiceProviderID: providerID,
 		}
 
@@ -68,24 +75,24 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 
 		db, err := database.New()
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
 		}
-		
+
 		r := db.Preload("City").Preload("WorkingDays").Where(filters).Find(&priceRates)
 		if r.RowsAffected == 0 {
-			context.JSON(http.StatusNotFound, response.ErrorResponse {
-				Error: "Not Found",
+			context.JSON(http.StatusNotFound, response.ErrorResponse{
+				Error:   "Not Found",
 				Message: "There is not a service provider with the ID you provided or he does not have rates with the filters entered.",
 			})
 			return
-		}	
+		}
 
 		result := []response.PriceRateWorkingDays{}
-		
+
 		for _, priceRate := range priceRates {
 			result = append(result, mapper.CreatePriceRateWorkingDaysAsResponse(priceRate))
 		}
@@ -101,8 +108,8 @@ func (PriceRateController) FindActivePriceRate() gin.HandlerFunc {
 
 		_, err := uuid.FromString(providerID)
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Invalid ID",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
 			return
@@ -112,29 +119,35 @@ func (PriceRateController) FindActivePriceRate() gin.HandlerFunc {
 
 		_, err = uuid.FromString(cityID)
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Invalid ID",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
 			return
 		}
-		
-		kindOfService := 0
-		if context.Query("kindOfService") != "" {
-			kindOfService, err = strconv.Atoi(context.Query("kindOfService"))
-			if err != nil {
-				context.JSON(http.StatusBadRequest, response.ErrorResponse {
-					Error: "Bad Request",
-					Message: "Invalid kind of service parameter",
-				})
-				return
-			}
-		} 
+
+		var kindOfService int
+		if context.Query("kindOfService") == "" {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Bad Request",
+				Message: "Invalid kind of service parameter",
+			})
+			return
+		}
+
+		kindOfService, err = strconv.Atoi(context.Query("kindOfService"))
+		if err != nil {
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Bad Request",
+				Message: "Invalid kind of service parameter",
+			})
+			return
+		}
 
 		db, err := database.New()
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.AbortWithStatusJSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
@@ -142,12 +155,12 @@ func (PriceRateController) FindActivePriceRate() gin.HandlerFunc {
 
 		filters := struct {
 			ServiceProviderID string
-			CityID string
-			KindOfService int
-		} {
+			CityID            string
+			KindOfService     int
+		}{
 			ServiceProviderID: providerID,
-			CityID: cityID,
-			KindOfService: kindOfService,
+			CityID:            cityID,
+			KindOfService:     kindOfService,
 		}
 
 		type PriceResult struct {
@@ -156,23 +169,25 @@ func (PriceRateController) FindActivePriceRate() gin.HandlerFunc {
 
 		var priceRate PriceResult
 
-		currentHour := time.Now()		
-		hour := currentHour.Format("15:04")		
-		r := db.Model(&entity.PriceRate{}).Where(filters).
-		Where("? >= starting_hour AND ? < ending_hour", hour, hour).
-		Find(&priceRate)
+		currentHour := time.Now()
+		currentWeekDay := utility.ServerWeekDay()
+		hour := currentHour.Format("15:04")
+		r := db.Table("price_rates").Select("price_rates.id, price_rates.price, pricerate_workingdays.working_day_id").
+			Joins("inner join pricerate_workingdays on pricerate_workingdays.price_rate_id = price_rates.id").
+			Where(filters).Where("? >= starting_hour AND ? < ending_hour AND pricerate_workingdays.working_day_id = ?", hour, hour, currentWeekDay).
+			Scan(&priceRate)		
 
 		if r.Error != nil {
-			context.AbortWithStatusJSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.AbortWithStatusJSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
 		}
 
 		if r.RowsAffected == 0 {
-			context.JSON(http.StatusNotFound, response.ErrorResponse {
-				Error: "Not Found",
+			context.JSON(http.StatusNotFound, response.ErrorResponse{
+				Error:   "Not Found",
 				Message: "There is not an active price rate for the criteria you entered.",
 			})
 			return
@@ -180,7 +195,7 @@ func (PriceRateController) FindActivePriceRate() gin.HandlerFunc {
 
 		response := struct {
 			Price float64 `json:"price"`
-		} {
+		}{
 			Price: priceRate.Price,
 		}
 
@@ -197,8 +212,8 @@ func (PriceRateController) Store() gin.HandlerFunc {
 
 		_, err := uuid.FromString(providerID)
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Invalid ID",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
 			return
@@ -206,28 +221,28 @@ func (PriceRateController) Store() gin.HandlerFunc {
 
 		err = context.BindJSON(&priceRate)
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Bad Input",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Bad Input",
 				Message: "Please make sure you send valid data",
 			})
 			return
 		}
 
-		v := utility.NewValidator()				
+		v := utility.NewValidator()
 
 		err = v.Struct(priceRate)
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Bad Input",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Bad Input",
 				Message: "Please make sure you've entered the required fields in the specified format. For more details, check the API documentation",
 			})
 			return
-		}	
+		}
 
 		e, err := priceRate.ToEntity(providerID)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
@@ -235,24 +250,24 @@ func (PriceRateController) Store() gin.HandlerFunc {
 
 		startingHour, err := time.Parse("15:04", e.StartingHour)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
 		}
 		endingHour, err := time.Parse("15:04", e.EndingHour)
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
 		}
 
 		if startingHour.Equal(endingHour) || startingHour.After(endingHour) {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "The starting hour cannot occur neither before nor at the same time than the ending hour",
 			})
 			return
@@ -260,8 +275,8 @@ func (PriceRateController) Store() gin.HandlerFunc {
 
 		db, err := database.New()
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
@@ -270,8 +285,8 @@ func (PriceRateController) Store() gin.HandlerFunc {
 		var matchingPriceRates []entity.PriceRate
 		r := db.Where(&entity.PriceRate{WorkingDays: e.WorkingDays, KindOfService: e.KindOfService, CityID: e.CityID, ServiceProviderID: providerID}).Find(&matchingPriceRates)
 		if r.Error != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
@@ -280,16 +295,16 @@ func (PriceRateController) Store() gin.HandlerFunc {
 		if len(matchingPriceRates) > 0 {
 			collides, err := priceRatesCollide(priceRate, matchingPriceRates)
 			if err != nil {
-				context.JSON(http.StatusConflict, response.ErrorResponse {
-					Error: "Internal Error",
+				context.JSON(http.StatusConflict, response.ErrorResponse{
+					Error:   "Internal Error",
 					Message: "There was an unexpected error while processing your data. Please try again later",
 				})
 				return
 			}
 
 			if collides {
-				context.JSON(http.StatusConflict, response.ErrorResponse {
-					Error: "Colliding Price Rate",
+				context.JSON(http.StatusConflict, response.ErrorResponse{
+					Error:   "Colliding Price Rate",
 					Message: "You already have a price rate that applies for the criteria you established",
 				})
 				return
@@ -298,8 +313,8 @@ func (PriceRateController) Store() gin.HandlerFunc {
 
 		r = db.Create(&e)
 		if r.Error != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
@@ -341,8 +356,8 @@ func (PriceRateController) Delete() gin.HandlerFunc {
 		providerId := context.Param("serviceProviderId")
 		_, err := uuid.FromString(providerId)
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Invalid ID",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Invalid ID",
 				Message: "The providerId you provided has an invalid format",
 			})
 			return
@@ -351,8 +366,8 @@ func (PriceRateController) Delete() gin.HandlerFunc {
 		priceRateId := context.Param("priceRateId")
 		_, err = uuid.FromString(priceRateId)
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Invalid ID",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Invalid ID",
 				Message: "The priceRateId you provided has an invalid format",
 			})
 			return
@@ -362,21 +377,21 @@ func (PriceRateController) Delete() gin.HandlerFunc {
 
 		db, err := database.New()
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
 		}
-		
+
 		r := db.Where("id = ? ", priceRateId).Where("service_provider_id = ?", providerId).Delete(&priceRate)
 		if r.RowsAffected == 0 {
-			context.JSON(http.StatusNotFound, response.ErrorResponse {
-				Error: "Not Found",
+			context.JSON(http.StatusNotFound, response.ErrorResponse{
+				Error:   "Not Found",
 				Message: "There is not a price rate or service provider with the ID you provided.",
 			})
 			return
-		}	
+		}
 
 		context.Status(http.StatusNoContent)
 	}
