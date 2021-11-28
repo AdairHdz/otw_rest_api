@@ -64,7 +64,8 @@ func (UserController) Login() gin.HandlerFunc {
 			UserType int `json:"userType"`
 			Verified bool `json:"verified"`
 			Password string `json:"-"`
-			ID string `json:"id"`			
+			ID string `json:"id"`
+			Token string `json:"token"`
 		}{}
 
 		result := db.Raw("SELECT users.id as user_id, users.names, users.lastname," +
@@ -93,7 +94,7 @@ func (UserController) Login() gin.HandlerFunc {
 			return
 		}
 
-		token, err := utility.SignString(loginResponse.ID, loginResponse.UserType, loginResponse.EmailAddress, time.Now().Add(15 * time.Minute))
+		token, err := utility.SignString(loginResponse.UserID, loginResponse.ID, loginResponse.UserType, loginResponse.EmailAddress, time.Now().Add(15 * time.Minute), utility.EPHIMERAL)
 		if err != nil {	
 			context.JSON(http.StatusConflict, response.ErrorResponse {
 				Error: "Internal Error",
@@ -102,17 +103,17 @@ func (UserController) Login() gin.HandlerFunc {
 			return
 		}		
 
-		refreshToken, err := utility.SignString(loginResponse.ID, loginResponse.UserType, loginResponse.EmailAddress, time.Now().Add(24 * time.Hour))
+		refreshToken, err := utility.SignString(loginResponse.UserID, loginResponse.ID, loginResponse.UserType, loginResponse.EmailAddress, time.Now().Add(24 * time.Hour), utility.REFRESH)
 		if err != nil {	
 			context.JSON(http.StatusConflict, response.ErrorResponse {
 				Error: "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})			
 			return
-		}				
+		}
 
-		context.SetCookie("jwt-token", refreshToken, int(time.Now().Add(time.Minute * 15).Unix()), "*", "*", false, true)
-		context.SetCookie("refresh-token", token, int(time.Now().Add(time.Hour * 24).Unix()), "*", "*", false, true)
+		loginResponse.Token = token		
+		context.SetCookie("refresh-token", refreshToken, int(time.Now().Add(time.Hour * 24).Unix()), "", "", false, true)
 		
 		context.JSON(http.StatusOK, loginResponse)
 
@@ -325,5 +326,62 @@ func (UserController) Verify() gin.HandlerFunc {
 		}
 	
 		context.Status(http.StatusNoContent)
+	}
+}
+
+func (UserController) RefreshToken() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		signedStringToken, err := context.Cookie("refresh-token")
+		if err != nil {
+			context.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse {
+				Error: "Unauthorized",
+				Message: "Please authenticate to proceed",
+			})
+			return
+		}
+
+		userID := context.Param("userId")
+		if userID == "" {
+			context.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad Request",
+				Message: "The user id you provider has an invalid format",
+			})
+			return
+		}
+
+		claimsFromToken, err := utility.ExtractCustomClaims(signedStringToken)
+		if err != nil {
+			context.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse {
+				Error: "Unauthorized",
+				Message: "Please authenticate to proceed",
+			})
+			return
+		}
+
+		if claimsFromToken.JWTType != utility.REFRESH {
+			context.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse {
+				Error: "Unauthorized",
+				Message: "Please make sure you send a valid refresh token",
+			})
+			return
+		}
+
+		newToken, err := utility.SignString(userID, claimsFromToken.SpecificID, claimsFromToken.UserType, claimsFromToken.EmailAddress, time.Now().Add(15 * time.Minute), utility.EPHIMERAL)
+		if err != nil {
+			context.AbortWithStatusJSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Conflict",
+				Message: "There was an error while trying to generate a new token for you. Please, try again later",
+			})
+			return
+		}
+
+		response := struct {
+			Token string `json:"token"`
+		}{
+			Token: newToken,
+		}
+		
+		context.JSON(http.StatusOK, response)
+
 	}
 }

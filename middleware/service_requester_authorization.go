@@ -1,16 +1,20 @@
 package middleware
 
-import (
+import (	
 	"net/http"
 
 	"github.com/AdairHdz/OTW-Rest-API/response"
 	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/request"
 )
 
 func ServiceRequesterAuthorization() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		signedStringToken, err := context.Cookie("jwt-token")
+		signedStringToken, err := request.ParseFromRequest(context.Request, request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error) {
+			return utility.PublicKey, nil
+		}, request.WithClaims(&utility.CustomClaims{}))
 		if err != nil {
 			context.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse {
 				Error: "Unauthorized",
@@ -19,7 +23,7 @@ func ServiceRequesterAuthorization() gin.HandlerFunc {
 			return
 		}
 
-		serviceRequesterIDFromToken, err := utility.ExtractCustomClaims(signedStringToken)
+		claimsFromToken, err := utility.ExtractCustomClaims(signedStringToken.Raw)
 		if err != nil {
 			context.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse {
 				Error: "Unauthorized",
@@ -38,8 +42,15 @@ func ServiceRequesterAuthorization() gin.HandlerFunc {
 			return
 		}
 
-		if serviceRequesterIDFromToken != serviceRequesterID {
-			context.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse {
+		// context.AbortWithStatusJSON(http.StatusOK, gin.H {			
+		// 	"claimsFromTokenID": claimsFromToken.UserID,
+		// 	"serviceRequesterID": serviceRequesterID,
+		// 	"rawToken": signedStringToken.Raw,
+		// })
+		
+		
+		if claimsFromToken.SpecificID != serviceRequesterID {
+			context.AbortWithStatusJSON(http.StatusConflict, response.ErrorResponse {
 				Error: "Unauthorized",
 				Message: "You have no permission to access or modify the requested resource",
 			})

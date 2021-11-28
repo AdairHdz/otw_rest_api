@@ -231,8 +231,7 @@ func (RequestController) StoreStatus() gin.HandlerFunc {
 
 		request := entity.ServiceRequest{}
 
-		isCancelEnd := db.Where("id = ?", requestId).Where("status = ?", entity.CANCELED).
-		Or("status = ?", entity.CONCLUDED).Find(&entity.ServiceRequest{})
+		isCancelEnd := db.Where("id = ? AND (status = ? OR status = ?)", requestId, entity.CANCELED, entity.CONCLUDED).Find(&entity.ServiceRequest{})
 
 		if isCancelEnd.RowsAffected != 0 {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
@@ -252,7 +251,7 @@ func (RequestController) StoreStatus() gin.HandlerFunc {
 			return
 		}		
 
-		context.Status(http.StatusOK)
+		context.Status(http.StatusNoContent)
 	}
 
 }

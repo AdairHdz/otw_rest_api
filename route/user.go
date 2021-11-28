@@ -16,7 +16,7 @@ func AppendUserRoutes(r *gin.Engine) {
 	u := r.Group("/users")	
 	u.POST("", userController.Store())
 	u.POST("/login", userController.Login())
-
+	u.POST("/:userId/token/refresh", userController.RefreshToken())
 	u.Use(middleware.Authentication())
 	u.PUT("/:userId/verify", userController.SendEmail())
 	u.PATCH("/:userId/verify", userController.Verify())
