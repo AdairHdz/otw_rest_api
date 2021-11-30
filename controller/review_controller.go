@@ -176,6 +176,15 @@ func (ReviewController) Store() gin.HandlerFunc {
 			return
 		}
 
+		hasBeenReviwed := db.Where("id = ?", reviewBody.ServiceRequestID).Where("has_been_reviewed = true").Find(&entity.ServiceRequest{})
+		if hasBeenReviwed.RowsAffected != 0 {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Service already reviewed",
+				Message: "The service request has already been reviewed by the service requester",
+			})
+			return
+		}
+
 		reviewEntity := reviewBody.ToEntity(providerID)
 		r := db.Create(&reviewEntity)
 		if r.Error != nil {
@@ -185,6 +194,15 @@ func (ReviewController) Store() gin.HandlerFunc {
 			})
 			return
 		}
+
+		reviewRequest := db.Model(&entity.ServiceRequest{}).Where("id = ?", reviewEntity.ServiceRequestID).Update( "has_been_reviewed" , true)
+		if reviewRequest.RowsAffected == 0 {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}	
 
 		response := mapper.CreateReviewWithRequesterIDAsResponse(reviewEntity)
 		context.JSON(http.StatusOK, response)

@@ -13,6 +13,7 @@ type Review struct {
 	Score              int              `json:"score" validate:"min=1,max=5"`
 	Evidence           []ReviewEvidence `json:"evidence"`
 	ServiceRequesterID string           `json:"serviceRequesterId" validate:"required,uuid4"`
+	ServiceRequestID   string           `json:"serviceRequestId" validate:"required,uuid4"`
 }
 
 func (r Review) ToEntity(serviceProviderID string) (entityReview entity.Review) {
@@ -28,7 +29,8 @@ func (r Review) ToEntity(serviceProviderID string) (entityReview entity.Review) 
 		Details: r.Details,
 		Score: r.Score,
 		ServiceRequesterID: r.ServiceRequesterID,
-		ServiceProviderID: serviceProviderID,		
+		ServiceProviderID: serviceProviderID,	
+		ServiceRequestID: r.ServiceRequestID,	
 	}
 	return
 }

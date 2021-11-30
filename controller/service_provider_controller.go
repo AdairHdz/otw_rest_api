@@ -356,13 +356,19 @@ func (ServiceProviderController) GetStatistics() gin.HandlerFunc {
 
 		_, err = time.Parse("2006-01-02", startingDate)
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusBadRequest, "The starting date you provided has a non-valid format.")
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad request",
+				Message: "The starting date you provided has a non-valid format.",
+			})
 			return
 		}
 
 		_, err = time.Parse("2006-01-02", endingDate)
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusBadRequest, "The ending date you provided has a non-valid format.")
+			context.JSON(http.StatusBadRequest, response.ErrorResponse {
+				Error: "Bad request",
+				Message: "The ending date you provided has a non-valid format.",
+			})
 			return
 		}		
 

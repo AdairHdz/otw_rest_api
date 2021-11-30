@@ -47,22 +47,17 @@ func (PriceRateController) FindAll() gin.HandlerFunc {
 			}
 		}
 
-		cityID := context.Query("cityId")
-		if cityID == "" {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse{
-				Error:   "Invalid ID",
-				Message: "The city ID you provided has an invalid format",
-			})
+		cityID := ""
+		if context.Query("cityId") != "" {
+			cityID = context.Query("cityId")
+			_, err = uuid.FromString(cityID)
+			if err != nil {
+				context.JSON(http.StatusBadRequest, response.ErrorResponse{
+					Error:   "Invalid ID",
+					Message: "The cityID you provided has an invalid format",
+				})
 			return
-		}
-
-		_, err = uuid.FromString(cityID)
-		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse{
-				Error:   "Invalid ID",
-				Message: "The city ID you provided has an invalid format",
-			})
-			return
+			}
 		}
 
 		filters := &FiltersKindOfServiceAndCity{
