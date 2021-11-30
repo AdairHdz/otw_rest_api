@@ -211,6 +211,17 @@ func (UserController) Store() gin.HandlerFunc {
 			return
 		}
 		res.Token = token
+		refreshToken, err := utility.SignString(res.UserID, res.ID, res.UserType, res.EmailAddress, time.Now().Add(24 * time.Hour), utility.REFRESH)
+		if err != nil {	
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})			
+			return
+		}
+		
+		context.SetCookie("refresh-token", refreshToken, int(time.Now().Add(time.Hour * 24).Unix()), "", "", false, true)
+		
 		context.JSON(http.StatusOK, res)
 	}
 }
