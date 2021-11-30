@@ -41,13 +41,6 @@ func ServiceRequesterAuthorization() gin.HandlerFunc {
 			})
 			return
 		}
-
-		// context.AbortWithStatusJSON(http.StatusOK, gin.H {			
-		// 	"claimsFromTokenID": claimsFromToken.UserID,
-		// 	"serviceRequesterID": serviceRequesterID,
-		// 	"rawToken": signedStringToken.Raw,
-		// })
-		
 		
 		if claimsFromToken.SpecificID != serviceRequesterID {
 			context.AbortWithStatusJSON(http.StatusConflict, response.ErrorResponse {
