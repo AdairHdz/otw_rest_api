@@ -195,12 +195,22 @@ func (UserController) Store() gin.HandlerFunc {
 
 		go utility.SendToEmail(requestData.EmailAddress, verificationCode)		
 
-		res := response.User{}
+		res := response.User{}		
+
 		if serviceRequester != nil {
 			res = mapper.CreateRequesterAddAsResponse(serviceRequester)
 		} else if serviceProvider != nil {
 			res = mapper.CreateProviderAddAsResponse(serviceProvider)
-		}	
+		}
+		token, err := utility.SignString(res.UserID, res.ID, res.UserType, res.EmailAddress, time.Now().Add(15 * time.Minute), utility.EPHIMERAL)
+		if err != nil {	
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal Error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})			
+			return
+		}
+		res.Token = token
 		context.JSON(http.StatusOK, res)
 	}
 }
