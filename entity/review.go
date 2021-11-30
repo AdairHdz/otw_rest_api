@@ -10,4 +10,6 @@ type Review struct {
 	ServiceProviderID string
 	ServiceRequesterID string
 	ServiceRequester ServiceRequester
+	ServiceRequestID string
+	ServiceRequest ServiceRequest
 }
