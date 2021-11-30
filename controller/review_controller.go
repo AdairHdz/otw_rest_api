@@ -176,7 +176,7 @@ func (ReviewController) Store() gin.HandlerFunc {
 			return
 		}
 
-		hasBeenReviwed := db.Preload("ServiceRequest", "has_been_reviewed = ? AND id = ?", true, reviewBody.ServiceRequestID).First(&entity.Review{})
+		hasBeenReviwed := db.Where("id = ?", reviewBody.ServiceRequestID).Where("has_been_reviewed = true").Find(&entity.ServiceRequest{})
 		if hasBeenReviwed.RowsAffected != 0 {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
 				Error: "Service already reviewed",
