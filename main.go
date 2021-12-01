@@ -5,13 +5,11 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"github.com/didip/tollbooth"
-	"github.com/didip/tollbooth/limiter"
+
 	"github.com/AdairHdz/OTW-Rest-API/database"
 	"github.com/AdairHdz/OTW-Rest-API/middleware"
 	"github.com/AdairHdz/OTW-Rest-API/route"
 	"github.com/gin-gonic/gin"
-	"github.com/didip/tollbooth_gin"
 )
 
 func main() {
@@ -26,11 +24,8 @@ func main() {
     }()
 	
 	os.Setenv("TZ", "America/Mexico_City")	
-	limiter := tollbooth.NewLimiter(50, &limiter.ExpirableOptions{DefaultExpirationTTL: (1 * time.Minute)})
-	limiter.SetIPLookups([]string{"RemoteAddr", "X-Forwarded-For", "X-Real-IP"})
 	r := gin.Default()
-	r.Use(tollbooth_gin.LimitHandler(limiter))
-	r.MaxMultipartMemory = 8 << 20	
+	r.MaxMultipartMemory = 8 << 20
 	r.Use(middleware.CORSMiddleware())
 	route.AppendUserRoutes(r)
 	route.AppendStateRoutes(r)
