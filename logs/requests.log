@@ -1,0 +1,51 @@
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /users                    --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.Store.func1 (6 handlers)
+[GIN-debug] POST   /users/login              --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.Login.func1 (6 handlers)
+[GIN-debug] POST   /users/:userId/token/refresh --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.RefreshToken.func1 (6 handlers)
+[GIN-debug] PUT    /users/:userId/verify     --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.SendEmail.func1 (7 handlers)
+[GIN-debug] PATCH  /users/:userId/verify     --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.Verify.func1 (7 handlers)
+[GIN-debug] GET    /states                   --> github.com/AdairHdz/OTW-Rest-API/controller.StateController.Index.func1 (6 handlers)
+[GIN-debug] GET    /states/:stateId/cities   --> github.com/AdairHdz/OTW-Rest-API/controller.StateController.IndexCities.func1 (6 handlers)
+[GIN-debug] PUT    /providers/:serviceProviderId/image --> github.com/AdairHdz/OTW-Rest-API/controller.ServiceProviderController.StoreImage.func1 (6 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId --> github.com/AdairHdz/OTW-Rest-API/controller.ServiceProviderController.GetWithId.func1 (7 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/reviews --> github.com/AdairHdz/OTW-Rest-API/controller.ReviewController.GetWithId.func1 (7 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/priceRates --> github.com/AdairHdz/OTW-Rest-API/controller.PriceRateController.FindAll.func1 (7 handlers)
+[GIN-debug] POST   /providers/:serviceProviderId/reviews --> github.com/AdairHdz/OTW-Rest-API/controller.ReviewController.Store.func1 (7 handlers)
+[GIN-debug] POST   /providers/:serviceProviderId/reviews/:reviewId/evidence --> github.com/AdairHdz/OTW-Rest-API/controller.ReviewController.UploadEvidence.func1 (7 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/priceRates/:cityId --> github.com/AdairHdz/OTW-Rest-API/controller.PriceRateController.FindActivePriceRate.func1 (7 handlers)
+[GIN-debug] GET    /providers                --> github.com/AdairHdz/OTW-Rest-API/controller.ServiceProviderController.Index.func1 (7 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/statistics --> github.com/AdairHdz/OTW-Rest-API/controller.ServiceProviderController.GetStatistics.func1 (8 handlers)
+[GIN-debug] POST   /providers/:serviceProviderId/priceRates --> github.com/AdairHdz/OTW-Rest-API/controller.PriceRateController.Store.func1 (8 handlers)
+[GIN-debug] DELETE /providers/:serviceProviderId/priceRates/:priceRateId --> github.com/AdairHdz/OTW-Rest-API/controller.PriceRateController.Delete.func1 (8 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/requests/:serviceRequestId --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.GetRequestProvider.func1 (8 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/requests --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.IndexRequestProvider.func1 (8 handlers)
+[GIN-debug] POST   /requesters/:serviceRequesterId/addresses --> github.com/AdairHdz/OTW-Rest-API/controller.AddressController.Store.func1 (8 handlers)
+[GIN-debug] GET    /requesters/:serviceRequesterId/addresses --> github.com/AdairHdz/OTW-Rest-API/controller.AddressController.Index.func1 (8 handlers)
+[GIN-debug] GET    /requesters/:serviceRequesterId/requests/:serviceRequestId --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.GetRequestRequester.func1 (8 handlers)
+[GIN-debug] GET    /requesters/:serviceRequesterId/requests --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.IndexRequestRequester.func1 (8 handlers)
+[GIN-debug] POST   /requests                 --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.Store.func1 (7 handlers)
+[GIN-debug] PATCH  /requests/:serviceRequestId --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.StoreStatus.func1 (7 handlers)
+[GIN-debug] GET    /images/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] HEAD   /images/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] GET    /reviews/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] HEAD   /reviews/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] Listening and serving HTTP on 0.0.0.0:8000
+IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: OPTIONS | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/reviews?page=1&pageSize=5 | StatusCode: 204
+[GIN] 2021/12/03 - 20:01:18 | 204 |      9.1436ms |      172.24.0.1 | OPTIONS  "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/reviews?page=1&pageSize=5"
+IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: OPTIONS | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679 | StatusCode: 204
+[GIN] 2021/12/03 - 20:01:18 | 204 |      9.3043ms |      172.24.0.1 | OPTIONS  "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679"
+IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: OPTIONS | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/priceRates | StatusCode: 204
+[GIN] 2021/12/03 - 20:01:18 | 204 |     11.9329ms |      172.24.0.1 | OPTIONS  "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/priceRates"
+IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: GET | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/reviews?page=1&pageSize=5 | StatusCode: 401
+[GIN] 2021/12/03 - 20:01:18 | 401 |      5.5301ms |      172.24.0.1 | GET      "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/reviews?page=1&pageSize=5"
+IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: GET | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/priceRates | StatusCode: 401
+[GIN] 2021/12/03 - 20:01:18 | 401 |     10.6894ms |      172.24.0.1 | GET      "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/priceRates"
+IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: GET | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679 | StatusCode: 401
+[GIN] 2021/12/03 - 20:01:18 | 401 |     16.6022ms |      172.24.0.1 | GET      "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679"
+IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: GET | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679 | StatusCode: 401
+[GIN] 2021/12/03 - 20:01:19 | 401 |     99.5635ms |      172.24.0.1 | GET      "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679"
