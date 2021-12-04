@@ -2,8 +2,7 @@ package controller
 
 import (
 	"fmt"
-	"net/http"
-	"path/filepath"
+	"net/http"	
 	"strconv"
 	"github.com/AdairHdz/OTW-Rest-API/database"
 	"github.com/AdairHdz/OTW-Rest-API/entity"
@@ -13,6 +12,7 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
+	"path/filepath"
 )
 
 type ReviewController struct{}
@@ -249,6 +249,8 @@ func (ReviewController) UploadEvidence() gin.HandlerFunc {
 			return
 		}
 
+		var evidenceEntities []entity.Evidence
+
 		for _, file := range files {
 			var fileSizeTotal int64 = file.Size
 			if fileSizeTotal > maxFileSize {
@@ -270,6 +272,32 @@ func (ReviewController) UploadEvidence() gin.HandlerFunc {
 				println("There was an error while trying to save the evidence", fileSavingError.Error())
 				context.AbortWithStatusJSON(http.StatusConflict, "There was an error while trying to save the evidence")
 			}
+			evidenceEntities = append(evidenceEntities, entity.Evidence{
+				EntityUUID: entity.EntityUUID{
+					ID: uuid.NewV4().String(),
+				},
+				FileName: file.Filename,
+				ReviewID: reviewId,
+				FileExtension: filepath.Ext(file.Filename),
+			})
+		}
+
+		db, err := database.New()
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
+		}
+
+		r := db.Create(evidenceEntities)
+		if r.Error != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse {
+				Error: "Internal error",
+				Message: "There was an unexpected error while processing your data. Please try again later",
+			})
+			return
 		}
 
 		context.Status(http.StatusCreated)
