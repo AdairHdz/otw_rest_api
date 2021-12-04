@@ -7,8 +7,9 @@ services:
     depends_on:
       - database
     volumes:
-      - images:/app/images
+      - ./images:/app/images
       - ./public/reviews:/app/public/reviews
+      - ./logs:/app/logs
   database:
     image: "mysql:8.0.26"
     container_name: ${DB_CONTAINER_NAME}
@@ -21,5 +22,3 @@ services:
       - ${DB_PORT}:3306
     volumes:
       - ./sql_data:/var/lib/mysql
-volumes:
-  images:
