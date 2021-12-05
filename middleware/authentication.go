@@ -31,6 +31,15 @@ func Authentication() gin.HandlerFunc {
 			})
 			return
 		}
+
+		_, ok := utility.Get(signedStringToken.Raw)
+		if ok {
+			context.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse {
+				Error: "Unauthorized",
+				Message: "The token you have introduced is no longer allowed to be used",
+			})
+			return
+		}
 		
 		context.Next()
 	}
