@@ -46,7 +46,15 @@ func (u *User) ToEntity() (sr *entity.ServiceRequester, sp *entity.ServiceProvid
 					Password:     string(hashedPassword),
 					UserType:     u.UserType,
 					Verified:     false,
-				},		
+				},
+				Score: entity.Score{
+					EntityUUID: entity.EntityUUID{
+						ID: uuid.NewV4().String(),
+					},					
+					AverageScore: 0,
+					MaxTotalPossible: 0,
+					ObtainedPoints: 0,
+				},
 			},
 		}
 		return
