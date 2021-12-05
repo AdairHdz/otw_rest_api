@@ -155,7 +155,7 @@ func (ServiceProviderController) GetWithId() gin.HandlerFunc {
 
 		score := entity.Score{}
 		averageScore := 0.00
-		s := db.Where("id = ?", serviceProvider.User.ID).Find(&score)
+		s := db.Where("user_id = ?", serviceProvider.User.ID).Find(&score)
 		if s.RowsAffected != 0 {
 			averageScore = score.AverageScore
 		}

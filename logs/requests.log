@@ -1,0 +1,72 @@
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /users                    --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.Store.func1 (6 handlers)
+[GIN-debug] POST   /users/login              --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.Login.func1 (6 handlers)
+[GIN-debug] POST   /users/logout             --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.Logout.func1 (6 handlers)
+[GIN-debug] POST   /users/:userId/token/refresh --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.RefreshToken.func1 (6 handlers)
+[GIN-debug] PUT    /users/:userId/verify     --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.SendEmail.func1 (7 handlers)
+[GIN-debug] PATCH  /users/:userId/verify     --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.Verify.func1 (7 handlers)
+[GIN-debug] GET    /states                   --> github.com/AdairHdz/OTW-Rest-API/controller.StateController.Index.func1 (6 handlers)
+[GIN-debug] GET    /states/:stateId/cities   --> github.com/AdairHdz/OTW-Rest-API/controller.StateController.IndexCities.func1 (6 handlers)
+[GIN-debug] PUT    /providers/:serviceProviderId/image --> github.com/AdairHdz/OTW-Rest-API/controller.ServiceProviderController.StoreImage.func1 (6 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId --> github.com/AdairHdz/OTW-Rest-API/controller.ServiceProviderController.GetWithId.func1 (7 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/reviews --> github.com/AdairHdz/OTW-Rest-API/controller.ReviewController.GetWithId.func1 (7 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/priceRates --> github.com/AdairHdz/OTW-Rest-API/controller.PriceRateController.FindAll.func1 (7 handlers)
+[GIN-debug] POST   /providers/:serviceProviderId/reviews --> github.com/AdairHdz/OTW-Rest-API/controller.ReviewController.Store.func1 (7 handlers)
+[GIN-debug] POST   /providers/:serviceProviderId/reviews/:reviewId/evidence --> github.com/AdairHdz/OTW-Rest-API/controller.ReviewController.UploadEvidence.func1 (7 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/priceRates/:cityId --> github.com/AdairHdz/OTW-Rest-API/controller.PriceRateController.FindActivePriceRate.func1 (7 handlers)
+[GIN-debug] GET    /providers                --> github.com/AdairHdz/OTW-Rest-API/controller.ServiceProviderController.Index.func1 (7 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/statistics --> github.com/AdairHdz/OTW-Rest-API/controller.ServiceProviderController.GetStatistics.func1 (8 handlers)
+[GIN-debug] POST   /providers/:serviceProviderId/priceRates --> github.com/AdairHdz/OTW-Rest-API/controller.PriceRateController.Store.func1 (8 handlers)
+[GIN-debug] DELETE /providers/:serviceProviderId/priceRates/:priceRateId --> github.com/AdairHdz/OTW-Rest-API/controller.PriceRateController.Delete.func1 (8 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/requests/:serviceRequestId --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.GetRequestProvider.func1 (8 handlers)
+[GIN-debug] GET    /providers/:serviceProviderId/requests --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.IndexRequestProvider.func1 (8 handlers)
+[GIN-debug] POST   /requesters/:serviceRequesterId/addresses --> github.com/AdairHdz/OTW-Rest-API/controller.AddressController.Store.func1 (8 handlers)
+[GIN-debug] GET    /requesters/:serviceRequesterId/addresses --> github.com/AdairHdz/OTW-Rest-API/controller.AddressController.Index.func1 (8 handlers)
+[GIN-debug] GET    /requesters/:serviceRequesterId/requests/:serviceRequestId --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.GetRequestRequester.func1 (8 handlers)
+[GIN-debug] GET    /requesters/:serviceRequesterId/requests --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.IndexRequestRequester.func1 (8 handlers)
+[GIN-debug] POST   /requests                 --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.Store.func1 (7 handlers)
+[GIN-debug] PATCH  /requests/:serviceRequestId --> github.com/AdairHdz/OTW-Rest-API/controller.RequestController.StoreStatus.func1 (7 handlers)
+[GIN-debug] GET    /images/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] HEAD   /images/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] GET    /reviews/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] HEAD   /reviews/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] Listening and serving HTTP on 0.0.0.0:8000
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: POST | Path: /users/ff25f808-ff0f-4927-a059-a3d8f8d6d919/token/refresh | StatusCode: 200
+[GIN] 2021/12/05 - 15:47:44 | 200 |      81.495ms |      172.27.0.1 | POST     "/users/ff25f808-ff0f-4927-a059-a3d8f8d6d919/token/refresh"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: OPTIONS | Path: /states | StatusCode: 204
+[GIN] 2021/12/05 - 15:47:46 | 204 |      15.098ms |      172.27.0.1 | OPTIONS  "/states"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: GET | Path: /states | StatusCode: 200
+[GIN] 2021/12/05 - 15:47:47 | 200 |    1.0681573s |      172.27.0.1 | GET      "/states"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: OPTIONS | Path: /states/395bd679-79b4-4517-9c27-72a92db797b3/cities | StatusCode: 204
+[GIN] 2021/12/05 - 15:47:49 | 204 |      1.7289ms |      172.27.0.1 | OPTIONS  "/states/395bd679-79b4-4517-9c27-72a92db797b3/cities"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: GET | Path: /states/395bd679-79b4-4517-9c27-72a92db797b3/cities | StatusCode: 200
+[GIN] 2021/12/05 - 15:47:49 | 200 |      9.1526ms |      172.27.0.1 | GET      "/states/395bd679-79b4-4517-9c27-72a92db797b3/cities"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: OPTIONS | Path: /providers?page=1&pageSize=10&maxPriceRate=85&cityId=2360ce3c-6c26-45af-8f53-93b96405c6ae&kindOfService=2 | StatusCode: 204
+[GIN] 2021/12/05 - 15:47:53 | 204 |      2.2591ms |      172.27.0.1 | OPTIONS  "/providers?page=1&pageSize=10&maxPriceRate=85&cityId=2360ce3c-6c26-45af-8f53-93b96405c6ae&kindOfService=2"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: GET | Path: /providers?page=1&pageSize=10&maxPriceRate=85&cityId=2360ce3c-6c26-45af-8f53-93b96405c6ae&kindOfService=2 | StatusCode: 200
+[GIN] 2021/12/05 - 15:47:53 | 200 |    119.3536ms |      172.27.0.1 | GET      "/providers?page=1&pageSize=10&maxPriceRate=85&cityId=2360ce3c-6c26-45af-8f53-93b96405c6ae&kindOfService=2"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: OPTIONS | Path: /providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2 | StatusCode: 204
+[GIN] 2021/12/05 - 15:47:54 | 204 |       588.1µs |      172.27.0.1 | OPTIONS  "/providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: OPTIONS | Path: /providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/reviews?page=1&pageSize=10 | StatusCode: 204
+[GIN] 2021/12/05 - 15:47:54 | 204 |       1.239ms |      172.27.0.1 | OPTIONS  "/providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/reviews?page=1&pageSize=10"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: OPTIONS | Path: /providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/priceRates | StatusCode: 204
+[GIN] 2021/12/05 - 15:47:54 | 204 |      6.0343ms |      172.27.0.1 | OPTIONS  "/providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/priceRates"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: GET | Path: /providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2 | StatusCode: 200
+[GIN] 2021/12/05 - 15:47:54 | 200 |     24.3908ms |      172.27.0.1 | GET      "/providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: GET | Path: /providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/priceRates | StatusCode: 200
+[GIN] 2021/12/05 - 15:47:55 | 200 |     20.5249ms |      172.27.0.1 | GET      "/providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/priceRates"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: GET | Path: /providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2 | StatusCode: 200
+[GIN] 2021/12/05 - 15:47:55 | 200 |     18.4123ms |      172.27.0.1 | GET      "/providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: GET | Path: /images/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/wallpaperflare.com_wallpaper (3).jpg | StatusCode: 304
+[GIN] 2021/12/05 - 15:47:55 | 304 |      9.1751ms |      172.27.0.1 | GET      "/images/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/wallpaperflare.com_wallpaper (3).jpg"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: GET | Path: /providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/reviews?page=1&pageSize=10 | StatusCode: 200
+[GIN] 2021/12/05 - 15:47:55 | 200 |     75.0565ms |      172.27.0.1 | GET      "/providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/reviews?page=1&pageSize=10"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:47 CST] | Requested Method: GET | Path: /providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/reviews?page=1&pageSize=10 | StatusCode: 200
+[GIN] 2021/12/05 - 15:47:55 | 200 |     13.9353ms |      172.27.0.1 | GET      "/providers/001a5bf1-c5bd-400b-ad9a-2e3513525ca2/reviews?page=1&pageSize=10"
+IP Address: 172.27.0.1 | TimeStamp: [05 Dec 21 15:48 CST] | Requested Method: GET | Path: /reviews/b0973261-c43b-4890-953d-4c7c90bd688f/wallpaperflare.com_wallpaper (2).jpg | StatusCode: 200
+[GIN] 2021/12/05 - 15:48:13 | 200 |    141.4662ms |      172.27.0.1 | GET      "/reviews/b0973261-c43b-4890-953d-4c7c90bd688f/wallpaperflare.com_wallpaper (2).jpg"

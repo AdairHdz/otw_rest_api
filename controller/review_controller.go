@@ -1,9 +1,12 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
-	"net/http"	
+	"net/http"
+	"path/filepath"
 	"strconv"
+
 	"github.com/AdairHdz/OTW-Rest-API/database"
 	"github.com/AdairHdz/OTW-Rest-API/entity"
 	"github.com/AdairHdz/OTW-Rest-API/mapper"
@@ -12,7 +15,7 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
-	"path/filepath"
+	"gorm.io/gorm"
 )
 
 type ReviewController struct{}
@@ -23,8 +26,8 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 		_, err := uuid.FromString(providerId)
 
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Invalid ID",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
 			return
@@ -32,8 +35,8 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 
 		page, err := strconv.Atoi(context.Query("page"))
 		if err != nil || page > 50 || page <= 0 {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Bad Request",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Bad Request",
 				Message: "Invalid page parameter.",
 			})
 			return
@@ -41,8 +44,8 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 
 		pageElements, err := strconv.Atoi(context.Query("pageSize"))
 		if err != nil || pageElements > 50 || pageElements <= 0 {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Bad Request",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Bad Request",
 				Message: "Invalid page elements parameter.",
 			})
 			return
@@ -52,37 +55,37 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 
 		db, err := database.New()
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal Error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal Error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
 		}
 
 		r := db.Scopes(utility.Paginate(page, pageElements)).Preload("ServiceRequester.User").Preload("Evidences").
-		Where("service_provider_id = ?", providerId).Find(&reviews)
-		
+			Where("service_provider_id = ?", providerId).Find(&reviews)
+
 		if r.RowsAffected == 0 {
-			context.JSON(http.StatusNotFound, response.ErrorResponse {
-				Error: "Not found",
+			context.JSON(http.StatusNotFound, response.ErrorResponse{
+				Error:   "Not found",
 				Message: "There is not a service provider with the ID you provided or he has no reviews.",
 			})
 			return
-		}	
-		
+		}
+
 		var rowCount int64
 		db.Model(&entity.Review{}).Where("service_provider_id = ?", providerId).Count(&rowCount)
 
 		result := []response.ReviewWithEvidence{}
-		
+
 		for _, review := range reviews {
 			result = append(result, mapper.CreateReviewWithEvidenceAsResponse(review))
 		}
 
 		round := float64(rowCount) / float64(pageElements)
-		
+
 		lastPage := int(utility.Roundf(round))
-		
+
 		var previousPage int = 1
 		var nextPage int
 
@@ -103,11 +106,11 @@ func (ReviewController) GetWithId() gin.HandlerFunc {
 				Prev  string `json:"prev"`
 				Next  string `json:"next"`
 			} `json:"links"`
-			Page    int                                    `json:"page"`
-			Pages   int                                    `json:"pages"`
-			PerPage int                                    `json:"perPage"`
-			Total   int64                                  `json:"total"`
-			Data    []response.ReviewWithEvidence		   `json:"data"`
+			Page    int                           `json:"page"`
+			Pages   int                           `json:"pages"`
+			PerPage int                           `json:"perPage"`
+			Total   int64                         `json:"total"`
+			Data    []response.ReviewWithEvidence `json:"data"`
 		}{
 			Links: struct {
 				First string `json:"first"`
@@ -138,8 +141,8 @@ func (ReviewController) Store() gin.HandlerFunc {
 		_, err := uuid.FromString(providerID)
 
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Invalid ID",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Invalid ID",
 				Message: "The ID you provided has an invalid format",
 			})
 			return
@@ -148,8 +151,8 @@ func (ReviewController) Store() gin.HandlerFunc {
 		var reviewBody request.Review
 		err = context.BindJSON(&reviewBody)
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Bad Request",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Bad Request",
 				Message: "Please make sure you have entered the required fields in a valid format",
 			})
 			return
@@ -157,20 +160,19 @@ func (ReviewController) Store() gin.HandlerFunc {
 
 		validator := utility.NewValidator()
 		err = validator.Struct(reviewBody)
-		
+
 		if err != nil {
-			context.JSON(http.StatusBadRequest, response.ErrorResponse {
-				Error: "Bad Request",
+			context.JSON(http.StatusBadRequest, response.ErrorResponse{
+				Error:   "Bad Request",
 				Message: "Please make sure you have entered the required fields ina valid format",
 			})
 			return
 		}
 
 		db, err := database.New()
-
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
@@ -178,31 +180,70 @@ func (ReviewController) Store() gin.HandlerFunc {
 
 		hasBeenReviwed := db.Where("id = ?", reviewBody.ServiceRequestID).Where("has_been_reviewed = true").Find(&entity.ServiceRequest{})
 		if hasBeenReviwed.RowsAffected != 0 {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Service already reviewed",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Service already reviewed",
 				Message: "The service request has already been reviewed by the service requester",
 			})
 			return
 		}
-
 		reviewEntity := reviewBody.ToEntity(providerID)
-		r := db.Create(&reviewEntity)
-		if r.Error != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal error",
+		err = db.Transaction(func(tx *gorm.DB) error {			
+			r := db.Create(&reviewEntity)
+			if r.Error != nil {
+				fmt.Println("Falló en línea 193")
+				fmt.Println(r.Error)
+				return r.Error
+			}
+
+			reviewRequest := db.Model(&entity.ServiceRequest{}).Where("id = ?", reviewEntity.ServiceRequestID).Update("has_been_reviewed", true)
+			if reviewRequest.RowsAffected == 0 {
+				fmt.Println("Falló en línea 200")
+				fmt.Println(r.Error)
+				return errors.New("no rows found")
+			}
+
+			var serviceProvider entity.ServiceProvider
+			r = db.Where("id = ?", providerID).Find(&serviceProvider)
+			if r.Error != nil {
+				fmt.Println("Falló en línea 208")
+				fmt.Println(r.Error)
+				return r.Error
+			}			
+
+			var score entity.Score
+			r = db.Where("user_id = ?", serviceProvider.UserID).Find(&score)
+			if r.Error != nil {
+				fmt.Println("Falló en línea 218")
+				fmt.Println(r.Error)
+				return r.Error
+			}			
+
+			newMaxTotalPossible := score.MaxTotalPossible + 5
+			newObtainedPoints := score.ObtainedPoints + reviewBody.Score
+			newAverageScore := float64(newObtainedPoints * 5 / newMaxTotalPossible)
+
+			score.MaxTotalPossible = newMaxTotalPossible
+			score.AverageScore = newAverageScore
+			score.ObtainedPoints = newObtainedPoints
+
+			r = db.Save(&score)
+			if r.Error != nil {
+				fmt.Println("Falló en línea 229")
+				fmt.Println(r.Error)
+				return r.Error
+			}
+			return nil
+		})
+
+		if err != nil {
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
+			fmt.Println("Falló en línea 238")
+			fmt.Println(err)
 			return
 		}
-
-		reviewRequest := db.Model(&entity.ServiceRequest{}).Where("id = ?", reviewEntity.ServiceRequestID).Update( "has_been_reviewed" , true)
-		if reviewRequest.RowsAffected == 0 {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal error",
-				Message: "There was an unexpected error while processing your data. Please try again later",
-			})
-			return
-		}	
 
 		response := mapper.CreateReviewWithRequesterIDAsResponse(reviewEntity)
 		context.JSON(http.StatusOK, response)
@@ -276,16 +317,16 @@ func (ReviewController) UploadEvidence() gin.HandlerFunc {
 				EntityUUID: entity.EntityUUID{
 					ID: uuid.NewV4().String(),
 				},
-				FileName: file.Filename,
-				ReviewID: reviewId,
+				FileName:      file.Filename,
+				ReviewID:      reviewId,
 				FileExtension: filepath.Ext(file.Filename),
 			})
 		}
 
 		db, err := database.New()
 		if err != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
@@ -293,8 +334,8 @@ func (ReviewController) UploadEvidence() gin.HandlerFunc {
 
 		r := db.Create(evidenceEntities)
 		if r.Error != nil {
-			context.JSON(http.StatusConflict, response.ErrorResponse {
-				Error: "Internal error",
+			context.JSON(http.StatusConflict, response.ErrorResponse{
+				Error:   "Internal error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
 			})
 			return
