@@ -13,7 +13,7 @@ type PriceRate struct {
 	Price         float64 `validate:"numeric,gt=0" json:"price"`
 	KindOfService int     `validate:"oneof=1 2 3 4 5" json:"kindOfService"`
 	CityID        string  `validate:"required,uuid4" json:"cityId"`
-	WorkingDays   []int   `validate:"required"json:"workingDays"`
+	WorkingDays   []int   `validate:"required" json:"workingDays"`
 }
 
 func (p *PriceRate) ToEntity(serviceProviderID string) (pr entity.PriceRate, err error) {
