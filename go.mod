@@ -7,6 +7,8 @@ require (
 	github.com/didip/tollbooth_gin v0.0.0-20170928041415-5752492be505 // indirect
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-playground/validator/v10 v10.9.0
+	github.com/go-redis/redis v6.15.9+incompatible // indirect
+	github.com/go-redis/redis/v8 v8.11.4 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -17,6 +19,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/ugorji/go v1.2.6 // indirect
+	go.opentelemetry.io/otel v0.16.0 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac // indirect
 	golang.org/x/text v0.3.7 // indirect

@@ -6,6 +6,7 @@
 
 [GIN-debug] POST   /users                    --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.Store.func1 (6 handlers)
 [GIN-debug] POST   /users/login              --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.Login.func1 (6 handlers)
+[GIN-debug] POST   /users/logout             --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.Logout.func1 (6 handlers)
 [GIN-debug] POST   /users/:userId/token/refresh --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.RefreshToken.func1 (6 handlers)
 [GIN-debug] PUT    /users/:userId/verify     --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.SendEmail.func1 (7 handlers)
 [GIN-debug] PATCH  /users/:userId/verify     --> github.com/AdairHdz/OTW-Rest-API/controller.UserController.Verify.func1 (7 handlers)
@@ -35,17 +36,23 @@
 [GIN-debug] GET    /reviews/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
 [GIN-debug] HEAD   /reviews/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
 [GIN-debug] Listening and serving HTTP on 0.0.0.0:8000
-IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: OPTIONS | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/reviews?page=1&pageSize=5 | StatusCode: 204
-[GIN] 2021/12/03 - 20:01:18 | 204 |      9.1436ms |      172.24.0.1 | OPTIONS  "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/reviews?page=1&pageSize=5"
-IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: OPTIONS | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679 | StatusCode: 204
-[GIN] 2021/12/03 - 20:01:18 | 204 |      9.3043ms |      172.24.0.1 | OPTIONS  "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679"
-IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: OPTIONS | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/priceRates | StatusCode: 204
-[GIN] 2021/12/03 - 20:01:18 | 204 |     11.9329ms |      172.24.0.1 | OPTIONS  "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/priceRates"
-IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: GET | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/reviews?page=1&pageSize=5 | StatusCode: 401
-[GIN] 2021/12/03 - 20:01:18 | 401 |      5.5301ms |      172.24.0.1 | GET      "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/reviews?page=1&pageSize=5"
-IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: GET | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/priceRates | StatusCode: 401
-[GIN] 2021/12/03 - 20:01:18 | 401 |     10.6894ms |      172.24.0.1 | GET      "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679/priceRates"
-IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: GET | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679 | StatusCode: 401
-[GIN] 2021/12/03 - 20:01:18 | 401 |     16.6022ms |      172.24.0.1 | GET      "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679"
-IP Address: 172.24.0.1 | TimeStamp: [03 Dec 21 20:01 CST] | Requested Method: GET | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679 | StatusCode: 401
-[GIN] 2021/12/03 - 20:01:19 | 401 |     99.5635ms |      172.24.0.1 | GET      "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679"
+IP Address: 172.24.0.1 | TimeStamp: [04 Dec 21 21:12 CST] | Requested Method: POST | Path: /users/login | StatusCode: 200
+[GIN] 2021/12/04 - 21:12:33 | 200 |    499.7724ms |      172.24.0.1 | POST     "/users/login"
+IP Address: 172.24.0.1 | TimeStamp: [04 Dec 21 21:12 CST] | Requested Method: POST | Path: /users/logout | StatusCode: 200
+[GIN] 2021/12/04 - 21:12:46 | 200 |     36.8958ms |      172.24.0.1 | POST     "/users/logout"
+IP Address: 172.24.0.1 | TimeStamp: [04 Dec 21 21:13 CST] | Requested Method: POST | Path: /users/15b02570-1327-4d3c-a1aa-7b0085dfefd3/token/refresh | StatusCode: 401
+[GIN] 2021/12/04 - 21:13:16 | 401 |      4.5658ms |      172.24.0.1 | POST     "/users/15b02570-1327-4d3c-a1aa-7b0085dfefd3/token/refresh"
+IP Address: 172.24.0.1 | TimeStamp: [04 Dec 21 21:13 CST] | Requested Method: POST | Path: /users/login | StatusCode: 200
+[GIN] 2021/12/04 - 21:13:23 | 200 |     77.7413ms |      172.24.0.1 | POST     "/users/login"
+IP Address: 172.24.0.1 | TimeStamp: [04 Dec 21 21:13 CST] | Requested Method: GET | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679 | StatusCode: 401
+[GIN] 2021/12/04 - 21:13:34 | 401 |       958.9µs |      172.24.0.1 | GET      "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679"
+IP Address: 172.24.0.1 | TimeStamp: [04 Dec 21 21:13 CST] | Requested Method: GET | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679 | StatusCode: 200
+[GIN] 2021/12/04 - 21:13:42 | 200 |      8.6752ms |      172.24.0.1 | GET      "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679"
+IP Address: 172.24.0.1 | TimeStamp: [04 Dec 21 21:13 CST] | Requested Method: POST | Path: /users/logout | StatusCode: 200
+[GIN] 2021/12/04 - 21:13:46 | 200 |      4.3287ms |      172.24.0.1 | POST     "/users/logout"
+IP Address: 172.24.0.1 | TimeStamp: [04 Dec 21 21:13 CST] | Requested Method: POST | Path: /users/logout | StatusCode: 204
+[GIN] 2021/12/04 - 21:13:56 | 204 |      2.0405ms |      172.24.0.1 | POST     "/users/logout"
+IP Address: 172.24.0.1 | TimeStamp: [04 Dec 21 21:14 CST] | Requested Method: GET | Path: /providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679 | StatusCode: 401
+[GIN] 2021/12/04 - 21:14:01 | 401 |      6.1798ms |      172.24.0.1 | GET      "/providers/1b4e8bee-6556-4b74-a8b2-f2352fca6679"
+IP Address: 172.24.0.1 | TimeStamp: [04 Dec 21 21:14 CST] | Requested Method: POST | Path: /users/15b02570-1327-4d3c-a1aa-7b0085dfefd3/token/refresh | StatusCode: 401
+[GIN] 2021/12/04 - 21:14:04 | 401 |      3.9363ms |      172.24.0.1 | POST     "/users/15b02570-1327-4d3c-a1aa-7b0085dfefd3/token/refresh"

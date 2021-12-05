@@ -3,3 +3,5 @@ sql_data/*
 .env
 keys/*
 public/reviews/*
+logs/*
+blacklist_data/

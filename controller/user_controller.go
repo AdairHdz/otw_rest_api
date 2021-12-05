@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"time"
+
 	"github.com/AdairHdz/OTW-Rest-API/database"
 	"github.com/AdairHdz/OTW-Rest-API/entity"
 	"github.com/AdairHdz/OTW-Rest-API/mapper"
@@ -10,6 +12,7 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/response"
 	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/gin-gonic/gin"
+	jwt_request "github.com/golang-jwt/jwt/request"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -117,6 +120,40 @@ func (UserController) Login() gin.HandlerFunc {
 		
 		context.JSON(http.StatusOK, loginResponse)
 
+	}
+}
+
+func (UserController) Logout() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		extractedToken, err := jwt_request.OAuth2Extractor.ExtractToken(context.Request)
+		if err != nil {
+			// Log error
+			context.Status(http.StatusNoContent)
+			return
+		}
+
+		err = utility.Save(extractedToken)
+		if err != nil {			
+			fmt.Println(err)
+			context.Status(http.StatusNoContent)
+			return
+		}
+		
+		refreshToken, err := context.Cookie("refresh-token")		
+		if err != nil {
+			// Log error
+			context.Status(http.StatusNoContent)
+			return
+		}
+		
+		context.SetCookie("refresh-token", refreshToken, -1 , "", "", false, true)
+		err = utility.Save(refreshToken)
+		if err != nil {
+			fmt.Println(err)
+			context.Status(http.StatusNoContent)
+			return
+		}
+		
 	}
 }
 
@@ -383,6 +420,15 @@ func (UserController) RefreshToken() gin.HandlerFunc {
 			context.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse {
 				Error: "Unauthorized",
 				Message: "Please make sure you send a valid refresh token",
+			})
+			return
+		}
+
+		_, ok := utility.Get(signedStringToken)
+		if ok {
+			context.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorResponse {
+				Error: "Unauthorized",
+				Message: "The token you have introduced is no longer allowed to create new tokens",
 			})
 			return
 		}

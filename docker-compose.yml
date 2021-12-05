@@ -10,6 +10,13 @@ services:
       - ./images:/app/images
       - ./public/reviews:/app/public/reviews
       - ./logs:/app/logs
+  black_list_redis:
+    image: "redis"
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./blacklist_data:/app/blacklist_data
+    entrypoint: redis-server --appendonly yes
   database:
     image: "mysql:8.0.26"
     container_name: ${DB_CONTAINER_NAME}
