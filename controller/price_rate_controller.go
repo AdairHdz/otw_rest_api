@@ -298,7 +298,7 @@ func (PriceRateController) Store() gin.HandlerFunc {
 			}
 
 			if collides {
-				context.JSON(http.StatusConflict, response.ErrorResponse{
+				context.JSON(453, response.ErrorResponse{
 					Error:   "Colliding Price Rate",
 					Message: "You already have a price rate that applies for the criteria you established",
 				})

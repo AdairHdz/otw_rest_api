@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/AdairHdz/OTW-Rest-API/database"
@@ -25,7 +26,7 @@ func (UserController) Login() gin.HandlerFunc {
 
 		loginInfo := struct {
 			EmailAddress string `json:"emailAddress" validate:"required,email,max=254"`
-			Password string `json:"password" validate:"required,min=8,securepass,max=150"`
+			Password string `json:"password" validate:"required,max=150"`
 		}{}
 		
 		err := context.BindJSON(&loginInfo)
@@ -71,14 +72,16 @@ func (UserController) Login() gin.HandlerFunc {
 			Token string `json:"token"`
 		}{}
 
-		result := db.Raw("SELECT users.id as user_id, users.names, users.lastname," +
-			"states.id as state_id," +
-			"accounts.email_address, accounts.user_type, accounts.verified, accounts.password," +
-    		"IF(accounts.user_type = ?, (SELECT id from otw.service_providers WHERE user_id = users.id), (SELECT id from otw.service_requesters WHERE user_id = users.id)) AS id" +
-			" from otw.users" +
-			" inner join otw.states on states.id = users.state_id" +
-    		" inner join otw.accounts on users.id = accounts.user_id" +
-			" where accounts.email_address = ?", entity.SERVICE_PROVIDER, loginInfo.EmailAddress).Scan(&loginResponse)
+		dbName := os.Getenv("DB_NAME")
+		queryString := fmt.Sprintf("SELECT users.id as user_id, users.names, users.lastname," +
+		"states.id as state_id," +
+		"accounts.email_address, accounts.user_type, accounts.verified, accounts.password," +
+		"IF(accounts.user_type = ?, (SELECT id from %s.service_providers WHERE user_id = users.id), (SELECT id from %s.service_requesters WHERE user_id = users.id)) AS id" +
+		" from %s.users" +
+		" inner join %s.states on states.id = users.state_id" +
+		" inner join %s.accounts on users.id = accounts.user_id" +
+		" where accounts.email_address = ?", dbName, dbName, dbName, dbName, dbName)
+		result := db.Raw(queryString, entity.SERVICE_PROVIDER, loginInfo.EmailAddress).Scan(&loginResponse)
 
 		err = bcrypt.CompareHashAndPassword([]byte(loginResponse.Password), []byte(loginInfo.Password))
 		if err != nil {						
