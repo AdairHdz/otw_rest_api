@@ -3,8 +3,7 @@ package database
 import (	
 	"fmt"
 	"os"
-	"github.com/AdairHdz/OTW-Rest-API/entity"
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/AdairHdz/OTW-Rest-API/entity"	
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

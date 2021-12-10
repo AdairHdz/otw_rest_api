@@ -2,6 +2,8 @@ version: "3.9"
 services:
   api:
     build: .
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     depends_on:
@@ -19,6 +21,8 @@ services:
     entrypoint: redis-server --appendonly yes
   database:
     image: "mysql:8.0.26"
+    env_file:
+      - .env
     container_name: ${DB_CONTAINER_NAME}
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "true"

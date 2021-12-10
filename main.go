@@ -24,7 +24,7 @@ func init() {
 func main() {
 	
 	go func() {
-        time.Sleep(30 * time.Second)
+        time.Sleep(1 * time.Minute)
 		_, err := database.New()
 
 		if err != nil {

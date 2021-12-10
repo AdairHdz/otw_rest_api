@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  api:
+    build: .
+    ports:
+      - "9000:8000"
+    depends_on:
+      - database
+    env_file:
+      - .env.test
+  black_list_redis:
+    image: "redis"
+    ports:
+      - "6479:6479"    
+    entrypoint: redis-server --appendonly yes
+  database:
+    image: "mysql:8.0.26"      
+    container_name: ${DB_CONTAINER_NAME}    
+    environment:      
+      MYSQL_RANDOM_ROOT_PASSWORD: "true"      
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - ${DB_PORT}:3306    
