@@ -216,7 +216,7 @@ func (ReviewController) Store() gin.HandlerFunc {
 				fmt.Println("Falló en línea 218")
 				fmt.Println(r.Error)
 				return r.Error
-			}			
+			}
 
 			newMaxTotalPossible := score.MaxTotalPossible + 5
 			newObtainedPoints := score.ObtainedPoints + reviewBody.Score
@@ -246,7 +246,7 @@ func (ReviewController) Store() gin.HandlerFunc {
 		}
 
 		response := mapper.CreateReviewWithRequesterIDAsResponse(reviewEntity)
-		context.JSON(http.StatusOK, response)
+		context.JSON(http.StatusCreated, response)
 
 	}
 }
