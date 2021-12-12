@@ -75,7 +75,7 @@ func (RequestController) Store() gin.HandlerFunc {
 		}
 
 		r := mapper.CreateRequestAddAsResponse(request)
-		context.JSON(http.StatusOK, r)
+		context.JSON(http.StatusCreated, r)
 	}
 }
 

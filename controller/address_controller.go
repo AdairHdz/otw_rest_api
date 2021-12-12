@@ -79,7 +79,7 @@ func (AddressController) Store() gin.HandlerFunc {
 		}
 
 		r := mapper.CreateAddressAsResponse(addressEntity)
-		context.JSON(http.StatusOK, r)
+		context.JSON(http.StatusCreated, r)
 	}
 }
 

@@ -262,7 +262,7 @@ func (UserController) Store() gin.HandlerFunc {
 		
 		context.SetCookie("refresh-token", refreshToken, int(time.Now().Add(time.Hour * 24).Unix()), "", "", false, true)
 		
-		context.JSON(http.StatusOK, res)
+		context.JSON(http.StatusCreated, res)
 	}
 }
 
@@ -326,7 +326,7 @@ func (UserController) SendEmail() gin.HandlerFunc {
 
 		go utility.SendToEmail(requestData.EmailAddress, verificationCode)		
 	
-		context.Status(http.StatusOK)
+		context.Status(http.StatusNoContent)
 	}
 }
 
