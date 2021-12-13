@@ -1,28 +1,22 @@
 version: "3.9"
 services:
-  api:
+  api_dev:
     build: .
     env_file:
-      - .env
+      - .env.dev
     ports:
-      - "8000:8000"
+      - ${API_PORT}:8000
     depends_on:
-      - database
-    volumes:
-      - ./images:/app/images
-      - ./public/reviews:/app/public/reviews
-      - ./logs:/app/logs
-  black_list_redis:
+      - database_dev    
+  black_list_redis_dev:
     image: "redis"
     ports:
-      - "6379:6379"
-    volumes:
-      - ./blacklist_data:/app/blacklist_data
+      - ${BLACKLIST_PORT}:6379    
     entrypoint: redis-server --appendonly yes
-  database:
+  database_dev:
     image: "mysql:8.0.26"
     env_file:
-      - .env
+      - .env.dev
     container_name: ${DB_CONTAINER_NAME}
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "true"
@@ -30,6 +24,4 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}      
     ports:
-      - ${DB_PORT}:3306
-    volumes:
-      - ./sql_data:/var/lib/mysql
+      - ${DB_PORT}:3306    
