@@ -14,6 +14,7 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/response"
 	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/gin-gonic/gin"
+	"github.com/kennygrant/sanitize"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
@@ -189,31 +190,27 @@ func (ReviewController) Store() gin.HandlerFunc {
 		reviewEntity := reviewBody.ToEntity(providerID)
 		err = db.Transaction(func(tx *gorm.DB) error {			
 			r := db.Create(&reviewEntity)
-			if r.Error != nil {
-				fmt.Println("Falló en línea 193")
+			if r.Error != nil {				
 				fmt.Println(r.Error)
 				return r.Error
 			}
 
 			reviewRequest := db.Model(&entity.ServiceRequest{}).Where("id = ?", reviewEntity.ServiceRequestID).Update("has_been_reviewed", true)
-			if reviewRequest.RowsAffected == 0 {
-				fmt.Println("Falló en línea 200")
+			if reviewRequest.RowsAffected == 0 {				
 				fmt.Println(r.Error)
 				return errors.New("no rows found")
 			}
 
 			var serviceProvider entity.ServiceProvider
 			r = db.Where("id = ?", providerID).Find(&serviceProvider)
-			if r.Error != nil {
-				fmt.Println("Falló en línea 208")
+			if r.Error != nil {				
 				fmt.Println(r.Error)
 				return r.Error
 			}			
 
 			var score entity.Score
 			r = db.Where("user_id = ?", serviceProvider.UserID).Find(&score)
-			if r.Error != nil {
-				fmt.Println("Falló en línea 218")
+			if r.Error != nil {				
 				fmt.Println(r.Error)
 				return r.Error
 			}
@@ -227,8 +224,7 @@ func (ReviewController) Store() gin.HandlerFunc {
 			score.ObtainedPoints = newObtainedPoints
 
 			r = db.Save(&score)
-			if r.Error != nil {
-				fmt.Println("Falló en línea 229")
+			if r.Error != nil {				
 				fmt.Println(r.Error)
 				return r.Error
 			}
@@ -239,8 +235,7 @@ func (ReviewController) Store() gin.HandlerFunc {
 			context.JSON(http.StatusConflict, response.ErrorResponse{
 				Error:   "Internal error",
 				Message: "There was an unexpected error while processing your data. Please try again later",
-			})
-			fmt.Println("Falló en línea 238")
+			})			
 			fmt.Println(err)
 			return
 		}
@@ -308,7 +303,8 @@ func (ReviewController) UploadEvidence() gin.HandlerFunc {
 		}
 
 		for _, file := range files {
-			fileSavingError := context.SaveUploadedFile(file, path+"/"+file.Filename)
+			sanitizedFileName := sanitize.Name(file.Filename)
+			fileSavingError := context.SaveUploadedFile(file, path+"/"+sanitizedFileName)
 			if fileSavingError != nil {
 				println("There was an error while trying to save the evidence", fileSavingError.Error())
 				context.AbortWithStatusJSON(http.StatusConflict, "There was an error while trying to save the evidence")
@@ -317,9 +313,9 @@ func (ReviewController) UploadEvidence() gin.HandlerFunc {
 				EntityUUID: entity.EntityUUID{
 					ID: uuid.NewV4().String(),
 				},
-				FileName:      file.Filename,
+				FileName:      sanitizedFileName,
 				ReviewID:      reviewId,
-				FileExtension: filepath.Ext(file.Filename),
+				FileExtension: filepath.Ext(sanitizedFileName),
 			})
 		}
 
