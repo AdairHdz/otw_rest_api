@@ -2,6 +2,7 @@ package request
 
 import (
 	"github.com/AdairHdz/OTW-Rest-API/entity"
+	"github.com/kennygrant/sanitize"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -30,7 +31,7 @@ func (u *User) ToEntity() (sr *entity.ServiceRequester, sp *entity.ServiceProvid
 				ID: uuid.NewV4().String(),
 			},
 			BusinessName: u.BusinessName,
-			BusinessPicture: u.BusinessPicture,
+			BusinessPicture: sanitize.Name(u.BusinessPicture),
 			User: entity.User{
 				EntityUUID: entity.EntityUUID{
 					ID: uuid.NewV4().String(),

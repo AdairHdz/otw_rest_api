@@ -14,6 +14,7 @@ import (
 	"github.com/AdairHdz/OTW-Rest-API/utility"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
+	"github.com/kennygrant/sanitize"
 )
 
 type ServiceProviderController struct{}
@@ -95,7 +96,8 @@ func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 			os.Remove(pathOfImageToBeDeleted)
 		}
 
-		err = context.SaveUploadedFile(file, path+"/"+file.Filename)
+		sanitizedFileName := sanitize.Name(file.Filename)
+		err = context.SaveUploadedFile(file, path+"/"+ sanitizedFileName)
 
 		if err != nil {
 			context.JSON(http.StatusConflict, response.ErrorResponse {
@@ -105,7 +107,7 @@ func (ServiceProviderController) StoreImage() gin.HandlerFunc {
 			return
 		}
 
-		serviceProvider.BusinessPicture = file.Filename
+		serviceProvider.BusinessPicture = sanitizedFileName
 		r = db.Model(&entity.ServiceProvider{}).Where("id = ?", serviceProvider.ID).Update("business_picture", serviceProvider.BusinessPicture)
 		
 		if r.Error != nil {
